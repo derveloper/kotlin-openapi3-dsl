@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    println(api3.asJson())
+    println(api3.asJson().toString(2))
 
     val vertx = Vertx.vertx()
 
