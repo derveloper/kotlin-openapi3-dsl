@@ -1,7 +1,9 @@
 
-import io.vertx.core.Vertx
-import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
 import io.vertx.kotlin.core.http.HttpServerOptions
+import io.vertx.reactivex.core.Vertx
+import io.vertx.reactivex.ext.web.api.contract.openapi3.OpenAPI3RouterFactory
+
+private val vertx = Vertx.vertx()
 
 fun main(args: Array<String>) {
     val api3 = openapi3 {
@@ -20,35 +22,29 @@ fun main(args: Array<String>) {
         }
     }
 
-    println(api3.asJson().toString(2))
-
     val apiFile = api3.asFile()
-    println(apiFile.absolutePath)
+    OpenAPI3RouterFactory.rxCreateRouterFactoryFromFile(vertx, apiFile.absolutePath)
+            .doOnError { it.printStackTrace() }
+            .doOnSuccess(::createOperationHandlers)
+            .doOnSubscribe { println("Server started") }
+            .subscribe(::startServer)
+}
 
-    val vertx = Vertx.vertx()
+fun startServer(routerFactory: OpenAPI3RouterFactory) {
+    val server = vertx.createHttpServer(HttpServerOptions(
+            port = 8080,
+            host = "localhost"))
+    val router = routerFactory.router
+    server.requestHandler({ router.accept(it) }).listen(8080)
+}
 
-    OpenAPI3RouterFactory.createRouterFactoryFromFile(vertx, apiFile.absolutePath, { ar ->
-        if (ar.succeeded()) {
-            // Spec loaded with success
-            val routerFactory = ar.result()
+private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
+    routerFactory.addHandlerByOperationId("hello", { routingContext ->
+        routingContext.response().end("Hello World!")
+    })
 
-            routerFactory.addHandlerByOperationId("hello", { routingContext ->
-                routingContext.response().end("Hello World!")
-            })
-
-            routerFactory.addFailureHandlerByOperationId("hello", { routingContext ->
-                println("FAIL")
-                routingContext.fail(500)
-            })
-
-            val server = vertx.createHttpServer(HttpServerOptions(
-                    port = 8080,
-                    host = "localhost"))
-            val router = routerFactory.router
-            server.requestHandler({ router.accept(it) }).listen(8080)
-        }
-        else {
-            ar.cause().printStackTrace()
-        }
+    routerFactory.addFailureHandlerByOperationId("hello", { routingContext ->
+        println("FAIL")
+        routingContext.fail(500)
     })
 }

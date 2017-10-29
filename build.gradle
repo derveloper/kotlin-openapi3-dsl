@@ -28,6 +28,8 @@ dependencies {
     compile 'io.vertx:vertx-web:3.5.0'
     compile 'io.vertx:vertx-web-api-contract:3.5.0'
     compile group: 'io.vertx', name: 'vertx-lang-kotlin', version: '3.5.0'
+    compile group: 'io.vertx', name: 'vertx-rx-java2', version: '3.5.0'
+    compile 'io.reactivex.rxjava2:rxkotlin:2.1.0'
     testCompile 'io.kotlintest:kotlintest:2.0.7'
 }
 
