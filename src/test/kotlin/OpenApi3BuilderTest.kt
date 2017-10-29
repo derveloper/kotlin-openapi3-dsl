@@ -46,7 +46,8 @@ class OpenApi3BuilderTest : StringSpec() {
             openApi3GetPath.get.description shouldBe "fooo"
             val openApi3Response = openApi3GetPath.get.responses["200"] as OpenApi3Response
             val openApi3MediaType = openApi3Response.content["application/json"]
-            openApi3MediaType?.schema?.getJSONObject("schema")?.getString("type") shouldBe "object"
+            openApi3MediaType?.schemaJson?.getJSONObject("schema")?.getString("type") shouldBe "object"
+            api.components.schemas.values.size shouldBe 1
         }
 
         "openapi should convert to valid openapi3 spec" {
