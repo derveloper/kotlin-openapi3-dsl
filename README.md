@@ -58,8 +58,8 @@ transforms to
 
 ## todo
 
+- [x] Make compatible to vertx OpenAPI3RouterFactory
 - [] Implement all OpenApi3 fields
-- [] Make compatible to vertx OpenAPI3RouterFactory
 - [] Publish on maven central
 
 
