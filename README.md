@@ -29,30 +29,20 @@ val spec = openapi3 {
 transforms to
 ```json
 {
-  "components": {"schemas": {}},
+  "components": {"schemas": {"String": {"type": "string"}}},
   "info": {
     "title": "test api",
     "version": "0.0.1"
   },
   "openapi": "3.0.0",
-  "paths": {
-    "/hello": {
-      "get": {
-        "description": "",
-        "operationId": "hello",
-        "responses": {
-          "200": {
-            "content": {
-              "text/plain": {
-                "schema": {"type": "string"}
-               }
-            },
-            "description": ""
-          }
-        }
-      }
-    }
-  }
+  "paths": {"/hello": {"get": {
+    "description": "",
+    "operationId": "hello",
+    "responses": {"200": {
+      "content": {"text/plain": {"schema": {"$ref": "#/components/schemas/String"}}},
+      "description": ""
+    }}
+  }}}
 }
 ```
 
