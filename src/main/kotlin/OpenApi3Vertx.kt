@@ -1,4 +1,3 @@
-
 import io.vertx.core.json.JsonObject.mapFrom
 import io.vertx.kotlin.core.http.HttpServerOptions
 import io.vertx.reactivex.core.Vertx
