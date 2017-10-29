@@ -29,6 +29,7 @@ private val api3 = openapi3 {
 
 fun main(args: Array<String>) {
     val apiFile = api3.asFile()
+    println(api3.asJson().toString(2))
     OpenAPI3RouterFactory.rxCreateRouterFactoryFromFile(vertx, apiFile.absolutePath)
             .doOnError { it.printStackTrace() }
             .doOnSuccess(::createOperationHandlers)

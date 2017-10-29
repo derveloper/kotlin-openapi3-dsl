@@ -9,40 +9,67 @@ for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt
 given this code
 
 ```kotlin
-val spec = openapi3 {
-        info {
-            title = "test api"
-            version = "0.0.1"
-        }
+data class HelloResponse(
+        val message: String
+)
 
-        paths {
-            get("/hello") {
-                operationId = "hello"
-                code("200") {
-                    response<String>("text/plain")
-                }
+val spec = openapi3 {
+    info {
+        title = "test api"
+        version = "0.0.1"
+    }
+
+    paths {
+        get("/hello") {
+            operationId = "hello"
+            code("200") {
+                response<HelloResponse>("application/json")
             }
         }
     }
+}
 ```
 
 transforms to
 ```json
 {
-  "components": {"schemas": {"String": {"type": "string"}}},
+  "components": {
+    "schemas": {
+      "HelloResponse": {
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    }
+  },
   "info": {
     "title": "test api",
     "version": "0.0.1"
   },
   "openapi": "3.0.0",
-  "paths": {"/hello": {"get": {
-    "description": "",
-    "operationId": "hello",
-    "responses": {"200": {
-      "content": {"text/plain": {"schema": {"$ref": "#/components/schemas/String"}}},
-      "description": ""
-    }}
-  }}}
+  "paths": {
+    "/hello": {
+      "get": {
+        "description": "",
+        "operationId": "hello",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloResponse"
+                }
+              }
+            },
+            "description": ""
+          }
+        }
+      }
+    }
+  }
 }
 ```
 
