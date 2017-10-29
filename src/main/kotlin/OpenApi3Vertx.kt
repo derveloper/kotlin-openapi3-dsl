@@ -22,16 +22,15 @@ fun main(args: Array<String>) {
 
     println(api3.asJson().toString(2))
 
-    val vertx = Vertx.vertx()
-
     val apiFile = api3.asFile()
     println(apiFile.absolutePath)
+
+    val vertx = Vertx.vertx()
 
     OpenAPI3RouterFactory.createRouterFactoryFromFile(vertx, apiFile.absolutePath, { ar ->
         if (ar.succeeded()) {
             // Spec loaded with success
             val routerFactory = ar.result()
-            val router = routerFactory.router
 
             routerFactory.addHandlerByOperationId("hello", { routingContext ->
                 routingContext.response().end("Hello World!")
@@ -45,10 +44,11 @@ fun main(args: Array<String>) {
             val server = vertx.createHttpServer(HttpServerOptions(
                     port = 8080,
                     host = "localhost"))
+            val router = routerFactory.router
             server.requestHandler({ router.accept(it) }).listen(8080)
         }
         else {
-            ar.cause()
+            ar.cause().printStackTrace()
         }
     })
 }
