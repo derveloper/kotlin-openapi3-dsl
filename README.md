@@ -59,8 +59,8 @@ transforms to
 ## todo
 
 - [x] Make compatible to vertx OpenAPI3RouterFactory
-- [] Implement all OpenApi3 fields
-- [] Publish on maven central
+- [ ] Implement all OpenApi3 fields
+- [ ] Publish on maven central
 
 
 ## license
