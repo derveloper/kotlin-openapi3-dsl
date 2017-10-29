@@ -4,6 +4,8 @@ Build your OpenApi3 spec in kotlin!
 
 ## example
 
+for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt)
+
 given this code
 
 ```kotlin
@@ -59,7 +61,6 @@ transforms to
 - [] Implement all OpenApi3 fields
 - [] Make compatible to vertx OpenAPI3RouterFactory
 - [] Publish on maven central
-
 
 
 ## license
