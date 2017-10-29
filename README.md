@@ -58,7 +58,7 @@ transforms to
 
 ## todo
 
-- [x] Make compatible to vertx OpenAPI3RouterFactory
+- [x] Make compatible to vertx [OpenAPI3RouterFactory](src/main/kotlin/OpenApi3Vertx.kt)
 - [ ] Implement all OpenApi3 fields
 - [ ] Publish on maven central
 
