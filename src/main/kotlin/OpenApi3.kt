@@ -164,7 +164,7 @@ data class OpenApi3(
 
     fun asJson(): JSONObject {
         val writeValueAsString = mapper.writeValueAsString(this)
-        return JSONObject(JSONTokener(writeValueAsString))
+        return JSONObject(JSONObject(JSONTokener(writeValueAsString)).toString())
     }
 
     fun asFile(): File {
