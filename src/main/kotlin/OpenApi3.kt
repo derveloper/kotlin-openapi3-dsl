@@ -90,6 +90,8 @@ data class OpenApi3PostPath(val post: OpenApi3Path) : OpenApi3MethodPath(post)
 data class OpenApi3PutPath(val put: OpenApi3Path) : OpenApi3MethodPath(put)
 data class OpenApi3DeletePath(val delete: OpenApi3Path) : OpenApi3MethodPath(delete)
 data class OpenApi3PatchPath(val patch: OpenApi3Path) : OpenApi3MethodPath(patch)
+data class OpenApi3HeadPath(val head: OpenApi3Path) : OpenApi3MethodPath(head)
+data class OpenApi3OptionsPath(val options: OpenApi3Path) : OpenApi3MethodPath(options)
 
 data class OpenApi3Paths(
         private val paths: MutableMap<String, Any> = HashMap()
@@ -122,6 +124,18 @@ data class OpenApi3Paths(
         val apiPath = OpenApi3Path()
         apiPath.init()
         put(path, OpenApi3PatchPath(apiPath))
+    }
+
+    fun head(path: String, init: OpenApi3Path.() -> Unit) {
+        val apiPath = OpenApi3Path()
+        apiPath.init()
+        put(path, OpenApi3HeadPath(apiPath))
+    }
+
+    fun options(path: String, init: OpenApi3Path.() -> Unit) {
+        val apiPath = OpenApi3Path()
+        apiPath.init()
+        put(path, OpenApi3OptionsPath(apiPath))
     }
 }
 

@@ -34,6 +34,12 @@ class OpenApi3BuilderTest : StringSpec() {
                 patch("/patch") {
                     description = "bar"
                 }
+                head("/head") {
+                    description = "bar"
+                }
+                options("/options") {
+                    description = "bar"
+                }
             }
         }
 
