@@ -83,7 +83,6 @@ class OpenApi3BuilderTest : StringSpec() {
         }
 
         "openapi should convert to valid openapi3 spec" {
-            val json = api.asJson()
             val file = api.asFile()
             //println(json.toString(2))
             val parse = OpenApi3Parser().parse(file, false)
