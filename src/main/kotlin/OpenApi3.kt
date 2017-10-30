@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import org.json.JSONObject
-import org.json.JSONTokener
 import java.io.File
 import java.nio.file.Files
 
@@ -96,46 +95,38 @@ data class OpenApi3OptionsPath(val options: OpenApi3Path) : OpenApi3MethodPath(o
 data class OpenApi3Paths(
         private val paths: MutableMap<String, Any> = HashMap()
 ) : MutableMap<String, Any> by paths {
-    fun get(path: String, init: OpenApi3Path.() -> Unit) {
+    private fun initOpenApi3Path(init: OpenApi3Path.() -> Unit): OpenApi3Path {
         val apiPath = OpenApi3Path()
         apiPath.init()
-        put(path, OpenApi3GetPath(apiPath))
+        return apiPath
+    }
+
+    fun get(path: String, init: OpenApi3Path.() -> Unit) {
+        put(path, OpenApi3GetPath(initOpenApi3Path(init)))
     }
 
     fun put(path: String, init: OpenApi3Path.() -> Unit) {
-        val apiPath = OpenApi3Path()
-        apiPath.init()
-        put(path, OpenApi3PutPath(apiPath))
+        put(path, OpenApi3PutPath(initOpenApi3Path(init)))
     }
 
     fun post(path: String, init: OpenApi3Path.() -> Unit) {
-        val apiPath = OpenApi3Path()
-        apiPath.init()
-        put(path, OpenApi3PostPath(apiPath))
+        put(path, OpenApi3PostPath(initOpenApi3Path(init)))
     }
 
     fun delete(path: String, init: OpenApi3Path.() -> Unit) {
-        val apiPath = OpenApi3Path()
-        apiPath.init()
-        put(path, OpenApi3DeletePath(apiPath))
+        put(path, OpenApi3DeletePath(initOpenApi3Path(init)))
     }
 
     fun patch(path: String, init: OpenApi3Path.() -> Unit) {
-        val apiPath = OpenApi3Path()
-        apiPath.init()
-        put(path, OpenApi3PatchPath(apiPath))
+        put(path, OpenApi3PatchPath(initOpenApi3Path(init)))
     }
 
     fun head(path: String, init: OpenApi3Path.() -> Unit) {
-        val apiPath = OpenApi3Path()
-        apiPath.init()
-        put(path, OpenApi3HeadPath(apiPath))
+        put(path, OpenApi3HeadPath(initOpenApi3Path(init)))
     }
 
     fun options(path: String, init: OpenApi3Path.() -> Unit) {
-        val apiPath = OpenApi3Path()
-        apiPath.init()
-        put(path, OpenApi3OptionsPath(apiPath))
+        put(path, OpenApi3OptionsPath(initOpenApi3Path(init)))
     }
 }
 
@@ -178,7 +169,7 @@ data class OpenApi3(
 
     fun asJson(): JSONObject {
         val writeValueAsString = mapper.writeValueAsString(this)
-        return JSONObject(JSONObject(JSONTokener(writeValueAsString)).toString())
+        return JSONObject(writeValueAsString)
     }
 
     fun asFile(): File {
