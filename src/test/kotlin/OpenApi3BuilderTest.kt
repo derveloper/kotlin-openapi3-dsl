@@ -7,6 +7,7 @@ import org.json.JSONObject
 
 data class ExampleSchema(val foo: String)
 data class AnotherExampleSchema(val bar: String)
+data class ExampleRequestSchema(val foo: String)
 
 class OpenApi3BuilderTest : StringSpec() {
     init {
@@ -17,22 +18,23 @@ class OpenApi3BuilderTest : StringSpec() {
                 version = "1.0"
             }
             paths {
-                get("/foo") {
+                get("/get") {
                     description = "fooo"
                     code("200") {
                         description = "some response"
                         response<ExampleSchema>("application/json")
                     }
                 }
-                put("/bar") {
+                put("/put") {
                     description = "bar"
                     code("200") {
                         description = "some response"
                         response<ExampleSchema>("application/json")
                     }
                 }
-                post("/baz") {
+                post("/post") {
                     description = "bar"
+                    requestBody<ExampleRequestSchema>("application/json")
                     code("200") {
                         description = "some response"
                         response<AnotherExampleSchema>("application/json")
@@ -74,17 +76,17 @@ class OpenApi3BuilderTest : StringSpec() {
             api.openapi shouldBe "3.0.0"
             api.info.title shouldBe "jjjj"
             api.info.version shouldBe "1.0"
-            val openApi3GetPath = api.paths["/foo"] as OpenApi3GetPath
+            val openApi3GetPath = api.paths["/get"] as OpenApi3GetPath
             openApi3GetPath.get.description shouldBe "fooo"
             val openApi3Response = openApi3GetPath.get.responses["200"] as OpenApi3Response
             val openApi3MediaType = openApi3Response.content["application/json"]
             openApi3MediaType?.schemaJson?.getJSONObject("schema")?.getString("type") shouldBe "object"
-            api.components.schemas.values.size shouldBe 2
+            api.components.schemas.values.size shouldBe 3
         }
 
         "openapi should convert to valid openapi3 spec" {
             val file = api.asFile()
-            //println(json.toString(2))
+            println(api.asJson().toString(2))
             val parse = OpenApi3Parser().parse(file, false)
             parse.validate()
             println(JSONObject(parse.toJson().toString()).toString(4))

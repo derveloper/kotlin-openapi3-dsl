@@ -62,6 +62,12 @@ data class OpenApi3Response(
     }
 }
 
+data class OpenApi3RequestBody(
+        var description: String = ""
+) {
+    val content = HashMap<String, OpenApi3TypedMediaType<*>>()
+}
+
 data class OpenApi3Responses(
         private val responses: MutableMap<String, OpenApi3Response> = HashMap()
 ) : MutableMap<String, OpenApi3Response> by responses
@@ -71,10 +77,17 @@ data class OpenApi3Path(
         var operationId: String = ""
 ) {
     val responses = OpenApi3Responses()
+    var requestBody: OpenApi3RequestBody? = null
     fun code(code: String, init: OpenApi3Response.() -> Unit) {
         val response = OpenApi3Response()
         response.init()
         responses.put(code, response)
+    }
+
+    inline fun <reified T> requestBody(mediaType: String) {
+        val apiMediaType = OpenApi3TypedMediaType(T::class.java)
+        requestBody = requestBody ?: OpenApi3RequestBody()
+        requestBody!!.content.put(mediaType, apiMediaType)
     }
 }
 
@@ -131,7 +144,7 @@ data class OpenApi3Paths(
 }
 
 data class OpenApi3Components(
-        val schemas: MutableMap<String, Any> = HashMap()
+        val schemas: Map<String, Any> = HashMap()
 )
 
 data class OpenApi3(
@@ -148,7 +161,7 @@ data class OpenApi3(
 
     val components: OpenApi3Components
         get() {
-            val components: MutableMap<String, Any> = paths
+            val responseSchemas: Map<String, Any> = paths
                     .map { it.value as OpenApi3MethodPath }
                     .flatMap { it.path.responses.values }
                     .flatMap { it.content.values }
@@ -156,7 +169,17 @@ data class OpenApi3(
                         m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
                         m
                     }
-            return OpenApi3Components(components)
+
+            val requestSchemas: Map<String, Any> = paths
+                    .map { it.value as OpenApi3MethodPath }
+                    .mapNotNull { it.path.requestBody }
+                    .flatMap { it.content.values }
+                    .fold(mutableMapOf()) { m, o ->
+                        m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
+                        m
+                    }
+
+            return OpenApi3Components(responseSchemas.plus(requestSchemas))
         }
 
     fun info(init: OpenApi3Info.() -> Unit) {

@@ -11,6 +11,10 @@ data class HelloResponse(
         val message: String
 )
 
+data class HelloRequest(
+        val message: String
+)
+
 private val api3 = openapi3 {
     info {
         title = "test api"
@@ -21,6 +25,7 @@ private val api3 = openapi3 {
         get("/hello") {
             operationId = "hello"
             code("200") {
+                requestBody<HelloRequest>("application/json")
                 response<HelloResponse>("application/json")
             }
         }
