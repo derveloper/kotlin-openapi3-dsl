@@ -1,4 +1,6 @@
-
+import cc.vileda.openapi3.OpenApi3Path
+import cc.vileda.openapi3.OpenApi3Response
+import cc.vileda.openapi3.openapi3
 import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
@@ -115,13 +117,5 @@ class OpenApi3BuilderTest : StringSpec() {
             parse.info.title shouldBe "jjjj"
             parse.info.version shouldBe "1.0"
         }
-
-        "request bodies should encode to json" {
-            val openApi3RequestBodies = OpenApi3RequestBodies()
-            openApi3RequestBodies.description = "foo"
-            openApi3RequestBodies.request<ExampleRequestSchema>("bar")
-            println(OpenApi3.mapper.writeValueAsString(openApi3RequestBodies))
-        }
-
     }
 }

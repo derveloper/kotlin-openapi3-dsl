@@ -1,4 +1,6 @@
-import OpenApi3.Companion.mapper
+package cc.vileda.openapi3
+
+import cc.vileda.openapi3.OpenApi3.Companion.mapper
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
