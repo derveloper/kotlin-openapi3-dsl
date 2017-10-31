@@ -107,14 +107,6 @@ open class OpenApi3MethodPath(
         val jsonKey: String
 )
 
-data class OpenApi3GetPath(val get: OpenApi3Path) : OpenApi3MethodPath(get, "get")
-data class OpenApi3PostPath(val post: OpenApi3Path) : OpenApi3MethodPath(post, "post")
-data class OpenApi3PutPath(val put: OpenApi3Path) : OpenApi3MethodPath(put, "put")
-data class OpenApi3DeletePath(val delete: OpenApi3Path) : OpenApi3MethodPath(delete, "delete")
-data class OpenApi3PatchPath(val patch: OpenApi3Path) : OpenApi3MethodPath(patch, "patch")
-data class OpenApi3HeadPath(val head: OpenApi3Path) : OpenApi3MethodPath(head, "head")
-data class OpenApi3OptionsPath(val options: OpenApi3Path) : OpenApi3MethodPath(options, "options")
-
 data class OpenApi3Paths(
         private val paths: MutableMap<String, MutableMap<String, OpenApi3Path>> = HashMap()
 ) : MutableMap<String, MutableMap<String, OpenApi3Path>> by paths {
@@ -133,31 +125,31 @@ data class OpenApi3Paths(
     }
 
     fun get(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3GetPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "get"))
     }
 
     fun put(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3PutPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "put"))
     }
 
     fun post(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3PostPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "post"))
     }
 
     fun delete(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3DeletePath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "delete"))
     }
 
     fun patch(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3PatchPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "patch"))
     }
 
     fun head(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3HeadPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "head"))
     }
 
     fun options(path: String, init: OpenApi3Path.() -> Unit) {
-        putPath(path, OpenApi3OptionsPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "options"))
     }
 }
 
