@@ -25,7 +25,7 @@ private val api3 = openapi3 {
         get("/hello") {
             operationId = "hello"
             description = "hello get"
-            code("200") {
+            ok {
                 description = "a 200 response"
                 response<HelloResponse>("application/json")
             }
@@ -34,7 +34,7 @@ private val api3 = openapi3 {
         post("/hello") {
             operationId = "postHello"
             description = "hello post"
-            code("200") {
+            created {
                 description = "a 200 response"
                 requestBody {
                     description = "example request"

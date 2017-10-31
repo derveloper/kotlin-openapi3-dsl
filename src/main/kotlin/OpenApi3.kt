@@ -87,6 +87,9 @@ data class OpenApi3Path(
         responses.put(code, response)
     }
 
+    fun created(init: OpenApi3Response.() -> Unit) = code("201", init)
+    fun ok(init: OpenApi3Response.() -> Unit) = code("200", init)
+
     fun requestBody(init: OpenApi3RequestBodies.() -> Unit) {
         if (requestBody == null) {
             requestBody = OpenApi3RequestBodies()
