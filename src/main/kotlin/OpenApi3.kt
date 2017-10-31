@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
+import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import org.json.JSONObject
 import java.io.File
 import java.nio.file.Files
@@ -214,14 +215,19 @@ data class OpenApi3(
         paths.init()
     }
 
-    fun asJson(): JSONObject {
+    private fun toJson(): JSONObject {
         val writeValueAsString = mapper.writeValueAsString(this)
         return JSONObject(writeValueAsString)
     }
 
+    fun asJson(): JSONObject {
+        val parse = OpenApi3Parser().parse(asFile())
+        return JSONObject(parse.toJson().toString())
+    }
+
     fun asFile(): File {
         val file = Files.createTempFile("openapi-", ".json").toFile()
-        file.writeText(asJson().toString())
+        file.writeText(toJson().toString())
         file.deleteOnExit()
         return file
     }

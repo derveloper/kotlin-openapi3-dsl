@@ -34,7 +34,7 @@ install {
             packaging 'aar'
             groupId 'cc.vileda'
             artifactId 'kotlin-openapi3-dsl'
-            version '0.0.1'
+            version "$version"
 
             licenses {
                 license {
