@@ -32,7 +32,7 @@ install {
             url 'https://github.com/derveloper/kotlin-openapi3-dsl'
             inceptionYear '2017'
 
-            packaging 'aar'
+            packaging 'jar'
             groupId 'cc.vileda'
             artifactId 'kotlin-openapi3-dsl'
             version "$version"
