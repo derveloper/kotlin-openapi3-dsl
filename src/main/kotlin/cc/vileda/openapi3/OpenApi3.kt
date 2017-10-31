@@ -23,6 +23,20 @@ interface OpenApi3MediaType {
     val schema: String
 }
 
+interface OpenApi3ParameterSchema {
+    val schema: String
+}
+
+private data class Schema(val schemaJson: JSONObject, val schema: String)
+
+private fun schemaFrom(clazz: Class<*>): Schema {
+    val schemaGen = JsonSchemaGenerator(mapper)
+    val s = schemaGen.generateSchema(clazz)
+    val jsonSchema = JSONObject(mapper.writeValueAsString(s))
+    jsonSchema.remove("id")
+    return Schema(JSONObject(mapOf("schema" to jsonSchema)), "#/components/schemas/${clazz.simpleName}")
+}
+
 data class OpenApi3TypedMediaType<T>(
         @field:JsonIgnore
         val clazz: Class<T>
@@ -32,19 +46,36 @@ data class OpenApi3TypedMediaType<T>(
     val schemaJson: JSONObject
 
     init {
-        val schemaGen = JsonSchemaGenerator(mapper)
-        val s = schemaGen.generateSchema(clazz)
-        val jsonSchema = JSONObject(mapper.writeValueAsString(s))
-        jsonSchema.remove("id")
-        schemaJson = JSONObject(mapOf("schema" to jsonSchema))
-        schema = "#/components/schemas/${clazz.simpleName}"
+        val genSchema = schemaFrom(clazz)
+        schemaJson = genSchema.schemaJson
+        schema = genSchema.schema
     }
+}
 
+data class OpenApi3TypedParameterSchema<T>(
+        @field:JsonIgnore
+        val clazz: Class<T>
+) : OpenApi3ParameterSchema {
+    override val schema: String
+    @field:JsonIgnore
+    val schemaJson: JSONObject
+
+    init {
+        val genSchema = schemaFrom(clazz)
+        schemaJson = genSchema.schemaJson
+        schema = genSchema.schema
+    }
 }
 
 class OpenApi3MediaTypeSerializer(mt: Class<OpenApi3MediaType>? = null) : StdSerializer<OpenApi3MediaType>(mt) {
     override fun serialize(value: OpenApi3MediaType, gen: JsonGenerator, provider: SerializerProvider?) {
         gen.writeRawValue(JSONObject(mapOf("schema" to mapOf("\$ref" to value.schema))).toString())
+    }
+}
+
+class OpenApi3ParameterSchemaSerializer(mt: Class<OpenApi3ParameterSchema>? = null) : StdSerializer<OpenApi3ParameterSchema>(mt) {
+    override fun serialize(value: OpenApi3ParameterSchema, gen: JsonGenerator, provider: SerializerProvider?) {
+        gen.writeRawValue(JSONObject(mapOf("\$ref" to value.schema)).toString())
     }
 }
 
@@ -59,8 +90,13 @@ data class OpenApi3Parameter(
         var `in`: String = "path",
         var description: String = "",
         var required: Boolean = true,
-        var style: String = "simple"
-)
+        var style: String = "simple",
+        var schema: OpenApi3TypedParameterSchema<*> = OpenApi3TypedParameterSchema(String::class.java)
+) {
+    inline fun <reified T> schema() {
+        schema = OpenApi3TypedParameterSchema(T::class.java)
+    }
+}
 
 data class OpenApi3Response(
         var description: String = ""
@@ -196,6 +232,7 @@ data class OpenApi3(
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
         module.addSerializer(OpenApi3MediaType::class.java, OpenApi3MediaTypeSerializer())
+        module.addSerializer(OpenApi3ParameterSchema::class.java, OpenApi3ParameterSchemaSerializer())
         module.addSerializer(OpenApi3Components::class.java, OpenApi3ComponentsSerializer())
         mapper.registerModule(module)
     }
@@ -220,7 +257,19 @@ data class OpenApi3(
                         m
                     }
 
-            return OpenApi3Components(responseSchemas.plus(requestSchemas))
+            val parameterSchemas: Map<String, Any> = paths.values
+                    .flatMap { it.values }
+                    .mapNotNull { it.parameters }
+                    .flatMap { it }
+                    .map { it.schema }
+                    .fold(mutableMapOf()) { m, o ->
+                        m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
+                        m
+                    }
+
+            return OpenApi3Components(responseSchemas
+                    .plus(requestSchemas)
+                    .plus(parameterSchemas))
         }
 
     fun info(init: OpenApi3Info.() -> Unit) {

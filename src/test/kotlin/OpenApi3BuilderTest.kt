@@ -1,3 +1,5 @@
+import cc.vileda.openapi3.OpenApi3.Companion.mapper
+import cc.vileda.openapi3.OpenApi3Parameter
 import cc.vileda.openapi3.OpenApi3Path
 import cc.vileda.openapi3.OpenApi3Response
 import cc.vileda.openapi3.openapi3
@@ -32,6 +34,7 @@ class OpenApi3BuilderTest : StringSpec() {
                     parameter {
                         description = "the id"
                         name = "id"
+                        schema<String>()
                     }
                     code("200") {
                         description = "some response"
@@ -124,7 +127,7 @@ class OpenApi3BuilderTest : StringSpec() {
             //openApi3Requests.values.size shouldBe 2
             val openApi3MediaType = openApi3Response.content["application/json"]
             openApi3MediaType?.schemaJson?.getJSONObject("schema")?.getString("type") shouldBe "object"
-            api.components.schemas.values.size shouldBe 3
+            api.components.schemas.values.size shouldBe 4
         }
 
         "openapi should convert to valid openapi3 spec" {
@@ -136,6 +139,11 @@ class OpenApi3BuilderTest : StringSpec() {
             parse.validationItems.size shouldBe 0
             parse.info.title shouldBe "jjjj"
             parse.info.version shouldBe "1.0"
+        }
+
+        "openapi parameter object should convert to json" {
+            val openApi3Parameter = OpenApi3Parameter()
+            println(mapper.writeValueAsString(openApi3Parameter))
         }
     }
 }
