@@ -6,7 +6,7 @@ Build your OpenApi3 spec in kotlin!
 
 for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt)
 
-given this code
+### minimal example 
 
 ```kotlin
 data class HelloResponse(
@@ -27,49 +27,6 @@ val spec = openapi3 {
             }
         }
     }
-}
-```
-
-transforms to
-```json
-{
-  "components": {
-    "schemas": {
-      "HelloResponse": {
-        "properties": {
-          "message": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      }
-    }
-  },
-  "info": {
-    "title": "test api",
-    "version": "0.0.1"
-  },
-  "openapi": "3.0.0",
-  "paths": {
-    "/hello": {
-      "get": {
-        "description": "",
-        "operationId": "hello",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HelloResponse"
-                }
-              }
-            },
-            "description": ""
-          }
-        }
-      }
-    }
-  }
 }
 ```
 
