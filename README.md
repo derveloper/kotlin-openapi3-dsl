@@ -183,6 +183,20 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
 
 - [x] Make compatible to vertx [OpenAPI3RouterFactory](src/main/kotlin/OpenApi3Vertx.kt)
 - [ ] Implement all OpenApi3 fields
+  - [ ] paths
+    - [x] all HTTP methods
+    - [x] minimal features
+    - [ ] complete features
+    - [ ] requestBody
+       - [x] minimal features
+       - [ ] examples
+       - [ ] complete features
+    - [ ] parameters
+      - [ ] minimal features
+      - [ ] complete features
+  - [x] components
+  - [x] $ref to components
+- [ ] Publish on jcenter
 - [ ] Publish on maven central
 
 
