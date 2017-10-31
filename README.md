@@ -1,5 +1,7 @@
 # kotlin-openapi3-dsl
 
+[ ![Download](https://api.bintray.com/packages/vileda/maven/kotlin-openapi3-dsl/images/download.svg) ](https://bintray.com/vileda/maven/kotlin-openapi3-dsl/_latestVersion)
+
 Build your OpenApi3 spec in kotlin!
 
 ## import
