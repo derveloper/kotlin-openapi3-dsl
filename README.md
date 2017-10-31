@@ -2,6 +2,28 @@
 
 Build your OpenApi3 spec in kotlin!
 
+## import
+
+currently kotlin-openapi3-dsl is available on bintray
+
+### gradle
+
+```groovy
+repositories {
+    ...
+    maven {
+        url  "https://dl.bintray.com/vileda/maven"
+    }
+    ...
+}
+
+dependencies {
+    ...
+    compile "cc.vileda:kotlin-openapi3-dsl:0.0.2"
+    ...
+}
+```
+
 ## example
 
 for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt)
@@ -153,6 +175,7 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
       - [ ] complete features
   - [x] components
   - [x] $ref to components
+- [x] Publish on bintray
 - [ ] Publish on jcenter
 - [ ] Publish on maven central
 
