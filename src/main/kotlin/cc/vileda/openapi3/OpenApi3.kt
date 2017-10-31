@@ -59,8 +59,7 @@ data class OpenApi3Parameter(
         var `in`: String = "path",
         var description: String = "",
         var required: Boolean = true,
-        var schema: OpenApi3MediaType? = null,
-        var style: String = ""
+        var style: String = "simple"
 )
 
 data class OpenApi3Response(
@@ -170,6 +169,10 @@ data class OpenApi3Paths(
 
     fun options(path: String, init: OpenApi3Path.() -> Unit) {
         putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "options"))
+    }
+
+    fun trace(path: String, init: OpenApi3Path.() -> Unit) {
+        putPath(path, OpenApi3MethodPath(initOpenApi3Path(init), "trace"))
     }
 }
 

@@ -98,6 +98,13 @@ class OpenApi3BuilderTest : StringSpec() {
                         response<ExampleSchema>("application/json")
                     }
                 }
+                trace("/path2") {
+                    description = "bar"
+                    code("200") {
+                        description = "some response"
+                        response<ExampleSchema>("application/json")
+                    }
+                }
             }
         }
 
