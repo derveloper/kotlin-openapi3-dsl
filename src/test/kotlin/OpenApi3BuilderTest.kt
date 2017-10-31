@@ -26,6 +26,17 @@ class OpenApi3BuilderTest : StringSpec() {
                         response<ExampleSchema>("application/json")
                     }
                 }
+                get("/path/{id}") {
+                    description = "fooo"
+                    parameter {
+                        description = "the id"
+                        name = "id"
+                    }
+                    code("200") {
+                        description = "some response"
+                        response<ExampleSchema>("application/json")
+                    }
+                }
                 put("/path") {
                     description = "bar"
                     code("200") {
@@ -113,6 +124,7 @@ class OpenApi3BuilderTest : StringSpec() {
             println(api.asJson().toString(2))
             val parse = OpenApi3Parser().parse(file, false)
             parse.validate()
+            parse.validationItems.forEach { println(it.msg) }
             parse.validationItems.size shouldBe 0
             parse.info.title shouldBe "jjjj"
             parse.info.version shouldBe "1.0"

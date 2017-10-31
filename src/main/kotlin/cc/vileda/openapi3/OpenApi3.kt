@@ -54,6 +54,15 @@ class OpenApi3ComponentsSerializer(mt: Class<OpenApi3Components>? = null) : StdS
     }
 }
 
+data class OpenApi3Parameter(
+        var name: String = "",
+        var `in`: String = "path",
+        var description: String = "",
+        var required: Boolean = true,
+        var schema: OpenApi3MediaType? = null,
+        var style: String = ""
+)
+
 data class OpenApi3Response(
         var description: String = ""
 ) {
@@ -84,6 +93,7 @@ data class OpenApi3Path(
 ) {
     val responses = OpenApi3Responses()
     var requestBody: OpenApi3RequestBodies? = null
+    var parameters: MutableList<OpenApi3Parameter>? = null
     fun code(code: String, init: OpenApi3Response.() -> Unit) {
         val response = OpenApi3Response()
         response.init()
@@ -97,6 +107,14 @@ data class OpenApi3Path(
         if (requestBody == null) {
             requestBody = OpenApi3RequestBodies()
             requestBody!!.init()
+        }
+    }
+
+    fun parameter(init: OpenApi3Parameter.() -> Unit) {
+        if (parameters == null) {
+            val parameter = OpenApi3Parameter()
+            parameter.init()
+            parameters = mutableListOf(parameter)
         }
     }
 }
