@@ -116,5 +116,12 @@ class OpenApi3BuilderTest : StringSpec() {
             parse.info.version shouldBe "1.0"
         }
 
+        "request bodies should encode to json" {
+            val openApi3RequestBodies = OpenApi3RequestBodies()
+            openApi3RequestBodies.description = "foo"
+            openApi3RequestBodies.request<ExampleRequestSchema>("bar")
+            println(OpenApi3.mapper.writeValueAsString(openApi3RequestBodies))
+        }
+
     }
 }

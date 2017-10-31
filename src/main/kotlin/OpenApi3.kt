@@ -1,4 +1,4 @@
-
+import OpenApi3.Companion.mapper
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
@@ -10,8 +10,6 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchemaGenerator
 import org.json.JSONObject
 import java.io.File
 import java.nio.file.Files
-
-private val mapper = ObjectMapper()
 
 data class OpenApi3Info(
         var title: String = "",
@@ -64,12 +62,12 @@ data class OpenApi3Response(
 }
 
 data class OpenApi3RequestBodies(
-        var description: String = "",
-        private val requests: MutableMap<String, OpenApi3TypedMediaType<*>> = HashMap()
-) : MutableMap<String, OpenApi3TypedMediaType<*>> by requests {
+        val content: MutableMap<String, OpenApi3TypedMediaType<*>> = HashMap()
+) {
+    var description: String? = null
     inline fun <reified T> request(mediaType: String) {
         val apiMediaType = OpenApi3TypedMediaType(T::class.java)
-        put(mediaType, apiMediaType)
+        content.put(mediaType, apiMediaType)
     }
 }
 
@@ -168,6 +166,11 @@ data class OpenApi3(
         var info: OpenApi3Info = OpenApi3Info(),
         var paths: OpenApi3Paths = OpenApi3Paths()
 ) {
+    companion object {
+        @field:JsonIgnore
+        val mapper = ObjectMapper()
+    }
+
     init {
         val module = SimpleModule()
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -191,7 +194,7 @@ data class OpenApi3(
             val requestSchemas: Map<String, Any> = paths.values
                     .flatMap { it.values }
                     .mapNotNull { it.requestBody }
-                    .flatMap { it.values }
+                    .flatMap { it.content.values }
                     .fold(mutableMapOf()) { m, o ->
                         m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
                         m
