@@ -100,52 +100,62 @@ data class OpenApi3Path(
 
 open class OpenApi3MethodPath(
         @field:JsonIgnore
-        val path: OpenApi3Path
+        val path: OpenApi3Path,
+        @field:JsonIgnore
+        val jsonKey: String
 )
 
-data class OpenApi3GetPath(val get: OpenApi3Path) : OpenApi3MethodPath(get)
-data class OpenApi3PostPath(val post: OpenApi3Path) : OpenApi3MethodPath(post)
-data class OpenApi3PutPath(val put: OpenApi3Path) : OpenApi3MethodPath(put)
-data class OpenApi3DeletePath(val delete: OpenApi3Path) : OpenApi3MethodPath(delete)
-data class OpenApi3PatchPath(val patch: OpenApi3Path) : OpenApi3MethodPath(patch)
-data class OpenApi3HeadPath(val head: OpenApi3Path) : OpenApi3MethodPath(head)
-data class OpenApi3OptionsPath(val options: OpenApi3Path) : OpenApi3MethodPath(options)
+data class OpenApi3GetPath(val get: OpenApi3Path) : OpenApi3MethodPath(get, "get")
+data class OpenApi3PostPath(val post: OpenApi3Path) : OpenApi3MethodPath(post, "post")
+data class OpenApi3PutPath(val put: OpenApi3Path) : OpenApi3MethodPath(put, "put")
+data class OpenApi3DeletePath(val delete: OpenApi3Path) : OpenApi3MethodPath(delete, "delete")
+data class OpenApi3PatchPath(val patch: OpenApi3Path) : OpenApi3MethodPath(patch, "patch")
+data class OpenApi3HeadPath(val head: OpenApi3Path) : OpenApi3MethodPath(head, "head")
+data class OpenApi3OptionsPath(val options: OpenApi3Path) : OpenApi3MethodPath(options, "options")
 
 data class OpenApi3Paths(
-        private val paths: MutableMap<String, OpenApi3MethodPath> = HashMap()
-) : MutableMap<String, OpenApi3MethodPath> by paths {
+        private val paths: MutableMap<String, MutableMap<String, OpenApi3Path>> = HashMap()
+) : MutableMap<String, MutableMap<String, OpenApi3Path>> by paths {
     private fun initOpenApi3Path(init: OpenApi3Path.() -> Unit): OpenApi3Path {
         val apiPath = OpenApi3Path()
         apiPath.init()
         return apiPath
     }
 
+    private fun putPath(path: String, methodPath: OpenApi3MethodPath) {
+        if (containsKey(path)) {
+            get(path)?.put(methodPath.jsonKey, methodPath.path)
+        } else {
+            put(path, mutableMapOf(methodPath.jsonKey to methodPath.path))
+        }
+    }
+
     fun get(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3GetPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3GetPath(initOpenApi3Path(init)))
     }
 
     fun put(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3PutPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3PutPath(initOpenApi3Path(init)))
     }
 
     fun post(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3PostPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3PostPath(initOpenApi3Path(init)))
     }
 
     fun delete(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3DeletePath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3DeletePath(initOpenApi3Path(init)))
     }
 
     fun patch(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3PatchPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3PatchPath(initOpenApi3Path(init)))
     }
 
     fun head(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3HeadPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3HeadPath(initOpenApi3Path(init)))
     }
 
     fun options(path: String, init: OpenApi3Path.() -> Unit) {
-        put(path, OpenApi3OptionsPath(initOpenApi3Path(init)))
+        putPath(path, OpenApi3OptionsPath(initOpenApi3Path(init)))
     }
 }
 
@@ -169,18 +179,18 @@ data class OpenApi3(
 
     val components: OpenApi3Components
         get() {
-            val responseSchemas: Map<String, Any> = paths
-                    .map { it.value }
-                    .flatMap { it.path.responses.values }
+            val responseSchemas: Map<String, Any> = paths.values
+                    .flatMap { it.values }
+                    .flatMap { it.responses.values }
                     .flatMap { it.content.values }
                     .fold(mutableMapOf()) { m, o ->
                         m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
                         m
                     }
 
-            val requestSchemas: Map<String, Any> = paths
-                    .map { it.value }
-                    .mapNotNull { it.path.requestBody }
+            val requestSchemas: Map<String, Any> = paths.values
+                    .flatMap { it.values }
+                    .mapNotNull { it.requestBody }
                     .flatMap { it.values }
                     .fold(mutableMapOf()) { m, o ->
                         m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
