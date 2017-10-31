@@ -25,7 +25,11 @@ private val api3 = openapi3 {
         get("/hello") {
             operationId = "hello"
             code("200") {
-                requestBody<HelloRequest>("application/json")
+                requestBody {
+                    description = "example request"
+                    request<HelloRequest>("application/json")
+                    request<HelloRequest>("application/xml")
+                }
                 response<HelloResponse>("application/json")
             }
         }

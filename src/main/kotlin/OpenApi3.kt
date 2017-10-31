@@ -1,5 +1,6 @@
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
@@ -62,10 +63,14 @@ data class OpenApi3Response(
     }
 }
 
-data class OpenApi3RequestBody(
-        var description: String = ""
-) {
-    val content = HashMap<String, OpenApi3TypedMediaType<*>>()
+data class OpenApi3RequestBodies(
+        var description: String = "",
+        private val requests: MutableMap<String, OpenApi3TypedMediaType<*>> = HashMap()
+) : MutableMap<String, OpenApi3TypedMediaType<*>> by requests {
+    inline fun <reified T> request(mediaType: String) {
+        val apiMediaType = OpenApi3TypedMediaType(T::class.java)
+        put(mediaType, apiMediaType)
+    }
 }
 
 data class OpenApi3Responses(
@@ -77,17 +82,18 @@ data class OpenApi3Path(
         var operationId: String = ""
 ) {
     val responses = OpenApi3Responses()
-    var requestBody: OpenApi3RequestBody? = null
+    var requestBody: OpenApi3RequestBodies? = null
     fun code(code: String, init: OpenApi3Response.() -> Unit) {
         val response = OpenApi3Response()
         response.init()
         responses.put(code, response)
     }
 
-    inline fun <reified T> requestBody(mediaType: String) {
-        val apiMediaType = OpenApi3TypedMediaType(T::class.java)
-        requestBody = requestBody ?: OpenApi3RequestBody()
-        requestBody!!.content.put(mediaType, apiMediaType)
+    fun requestBody(init: OpenApi3RequestBodies.() -> Unit) {
+        if (requestBody == null) {
+            requestBody = OpenApi3RequestBodies()
+            requestBody!!.init()
+        }
     }
 }
 
@@ -106,8 +112,8 @@ data class OpenApi3HeadPath(val head: OpenApi3Path) : OpenApi3MethodPath(head)
 data class OpenApi3OptionsPath(val options: OpenApi3Path) : OpenApi3MethodPath(options)
 
 data class OpenApi3Paths(
-        private val paths: MutableMap<String, Any> = HashMap()
-) : MutableMap<String, Any> by paths {
+        private val paths: MutableMap<String, OpenApi3MethodPath> = HashMap()
+) : MutableMap<String, OpenApi3MethodPath> by paths {
     private fun initOpenApi3Path(init: OpenApi3Path.() -> Unit): OpenApi3Path {
         val apiPath = OpenApi3Path()
         apiPath.init()
@@ -154,6 +160,8 @@ data class OpenApi3(
 ) {
     init {
         val module = SimpleModule()
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
         module.addSerializer(OpenApi3MediaType::class.java, OpenApi3MediaTypeSerializer())
         module.addSerializer(OpenApi3Components::class.java, OpenApi3ComponentsSerializer())
         mapper.registerModule(module)
@@ -162,7 +170,7 @@ data class OpenApi3(
     val components: OpenApi3Components
         get() {
             val responseSchemas: Map<String, Any> = paths
-                    .map { it.value as OpenApi3MethodPath }
+                    .map { it.value }
                     .flatMap { it.path.responses.values }
                     .flatMap { it.content.values }
                     .fold(mutableMapOf()) { m, o ->
@@ -171,9 +179,9 @@ data class OpenApi3(
                     }
 
             val requestSchemas: Map<String, Any> = paths
-                    .map { it.value as OpenApi3MethodPath }
+                    .map { it.value }
                     .mapNotNull { it.path.requestBody }
-                    .flatMap { it.content.values }
+                    .flatMap { it.values }
                     .fold(mutableMapOf()) { m, o ->
                         m.put(o.clazz.simpleName, o.schemaJson.getJSONObject("schema"))
                         m
