@@ -20,6 +20,7 @@ class OpenApi3BuilderTest : StringSpec() {
             }
             paths {
                 get("/path") {
+                    tags = listOf("foo", "bar")
                     description = "fooo"
                     code("200") {
                         description = "some response"

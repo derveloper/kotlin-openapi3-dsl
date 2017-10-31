@@ -88,7 +88,8 @@ data class OpenApi3Responses(
 
 data class OpenApi3Path(
         var description: String = "",
-        var operationId: String = ""
+        var operationId: String = "",
+        var tags: List<String> = emptyList()
 ) {
     val responses = OpenApi3Responses()
     var requestBody: OpenApi3RequestBodies? = null
