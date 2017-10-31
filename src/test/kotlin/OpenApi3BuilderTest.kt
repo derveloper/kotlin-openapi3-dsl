@@ -22,7 +22,7 @@ class OpenApi3BuilderTest : StringSpec() {
                 get("/path") {
                     tags = listOf("foo", "bar")
                     description = "fooo"
-                    code("200") {
+                    ok {
                         description = "some response"
                         response<ExampleSchema>("application/json")
                     }
@@ -52,7 +52,7 @@ class OpenApi3BuilderTest : StringSpec() {
                         request<ExampleRequestSchema>("application/json")
                         request<ExampleRequestSchema>("application/xml")
                     }
-                    code("200") {
+                    created {
                         description = "some response"
                         response<AnotherExampleSchema>("application/json")
                     }
