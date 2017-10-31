@@ -24,7 +24,18 @@ private val api3 = openapi3 {
     paths {
         get("/hello") {
             operationId = "hello"
+            description = "hello get"
             code("200") {
+                description = "a 200 response"
+                response<HelloResponse>("application/json")
+            }
+        }
+
+        post("/hello") {
+            operationId = "postHello"
+            description = "hello post"
+            code("200") {
+                description = "a 200 response"
                 requestBody {
                     description = "example request"
                     request<HelloRequest>("application/json")
@@ -57,7 +68,11 @@ fun startServer(routerFactory: OpenAPI3RouterFactory) {
 }
 
 fun bindAdditionalHandlers(router: Router) {
-    router.route().handler(CorsHandler.create("^.*$"))
+    val create = CorsHandler.create("^.*$")
+            .allowedHeaders(setOf(
+                    "Content-Type"
+            ))
+    router.route().handler(create)
 
     router.get("/spec.json").handler { routingContext ->
         routingContext.response()
@@ -67,6 +82,12 @@ fun bindAdditionalHandlers(router: Router) {
 }
 
 private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
+    routerFactory.addHandlerByOperationId("postHello", { routingContext ->
+        routingContext.response()
+                .putHeader("Content-Type", "application/json")
+                .end(mapFrom(HelloResponse("Hello World!")).encode())
+    })
+
     routerFactory.addHandlerByOperationId("hello", { routingContext ->
         routingContext.response()
                 .putHeader("Content-Type", "application/json")

@@ -89,6 +89,10 @@ data class HelloResponse(
         val message: String
 )
 
+data class HelloRequest(
+        val message: String
+)
+
 private val api3 = openapi3 {
     info {
         title = "test api"
@@ -98,7 +102,23 @@ private val api3 = openapi3 {
     paths {
         get("/hello") {
             operationId = "hello"
+            description = "hello get"
             code("200") {
+                description = "a 200 response"
+                response<HelloResponse>("application/json")
+            }
+        }
+
+        post("/hello") {
+            operationId = "postHello"
+            description = "hello post"
+            code("200") {
+                description = "a 200 response"
+                requestBody {
+                    description = "example request"
+                    request<HelloRequest>("application/json")
+                    request<HelloRequest>("application/xml")
+                }
                 response<HelloResponse>("application/json")
             }
         }
@@ -107,6 +127,7 @@ private val api3 = openapi3 {
 
 fun main(args: Array<String>) {
     val apiFile = api3.asFile()
+    println(api3.asJson().toString(2))
     OpenAPI3RouterFactory.rxCreateRouterFactoryFromFile(vertx, apiFile.absolutePath)
             .doOnError { it.printStackTrace() }
             .doOnSuccess(::createOperationHandlers)
@@ -125,7 +146,11 @@ fun startServer(routerFactory: OpenAPI3RouterFactory) {
 }
 
 fun bindAdditionalHandlers(router: Router) {
-    router.route().handler(CorsHandler.create("^.*$"))
+    val create = CorsHandler.create("^.*$")
+            .allowedHeaders(setOf(
+                    "Content-Type"
+            ))
+    router.route().handler(create)
 
     router.get("/spec.json").handler { routingContext ->
         routingContext.response()
@@ -135,6 +160,12 @@ fun bindAdditionalHandlers(router: Router) {
 }
 
 private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
+    routerFactory.addHandlerByOperationId("postHello", { routingContext ->
+        routingContext.response()
+                .putHeader("Content-Type", "application/json")
+                .end(mapFrom(HelloResponse("Hello World!")).encode())
+    })
+
     routerFactory.addHandlerByOperationId("hello", { routingContext ->
         routingContext.response()
                 .putHeader("Content-Type", "application/json")
