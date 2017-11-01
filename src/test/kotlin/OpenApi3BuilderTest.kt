@@ -1,7 +1,7 @@
-import cc.vileda.openapi3.OpenApiObject.Companion.mapper
-import cc.vileda.openapi3.OperationObject
-import cc.vileda.openapi3.ParameterObject
-import cc.vileda.openapi3.ResponseObject
+import cc.vileda.openapi3.OpenApi.Companion.mapper
+import cc.vileda.openapi3.Operation
+import cc.vileda.openapi3.Parameter
+import cc.vileda.openapi3.Response
 import cc.vileda.openapi3.openapi3
 import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.kotlintest.matchers.shouldBe
@@ -117,10 +117,10 @@ class OpenApi3BuilderTest : StringSpec() {
             api.openapi shouldBe "3.0.0"
             api.info.title shouldBe "jjjj"
             api.info.version shouldBe "1.0"
-            val openApi3GetPath = api.paths["/path"]?.get("get") as OperationObject
+            val openApi3GetPath = api.paths["/path"]?.get("get") as Operation
             //val openApi3PostPath = api.paths["/path"] as OpenApi3PostPath
             openApi3GetPath.description shouldBe "fooo"
-            val openApi3Response = openApi3GetPath.responses["200"] as ResponseObject
+            val openApi3Response = openApi3GetPath.responses["200"] as Response
             //val openApi3Requests = openApi3PostPath.post.requestBody
             //openApi3Requests shouldNotBe null
             //openApi3Requests!!.description shouldBe "example request"
@@ -142,7 +142,7 @@ class OpenApi3BuilderTest : StringSpec() {
         }
 
         "openapi parameter object should convert to json" {
-            val openApi3Parameter = ParameterObject()
+            val openApi3Parameter = Parameter()
             println(mapper.writeValueAsString(openApi3Parameter))
         }
     }

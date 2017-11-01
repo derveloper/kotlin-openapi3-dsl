@@ -1,6 +1,6 @@
 package cc.vileda.openapi3
 
-import cc.vileda.openapi3.OpenApiObject.Companion.mapper
+import cc.vileda.openapi3.OpenApi.Companion.mapper
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.JsonGenerator
@@ -14,33 +14,33 @@ import org.json.JSONObject
 import java.io.File
 import java.nio.file.Files
 
-data class InfoObject(
+data class Info(
         var title: String = "",
         var version: String = ""
 )
 
-interface SchemaObject {
+interface Schema {
     val schema: String
 }
 
-interface ParameterSchemaObject {
+interface ParameterSchema {
     val schema: String
 }
 
-private data class Schema(val schemaJson: JSONObject, val schema: String)
+private data class SchemaGen(val schemaJson: JSONObject, val schema: String)
 
-private fun schemaFrom(clazz: Class<*>): Schema {
+private fun schemaFrom(clazz: Class<*>): SchemaGen {
     val schemaGen = JsonSchemaGenerator(mapper)
     val s = schemaGen.generateSchema(clazz)
     val jsonSchema = JSONObject(mapper.writeValueAsString(s))
     jsonSchema.remove("id")
-    return Schema(JSONObject(mapOf("schema" to jsonSchema)), "#/components/schemas/${clazz.simpleName}")
+    return SchemaGen(JSONObject(mapOf("schema" to jsonSchema)), "#/components/schemas/${clazz.simpleName}")
 }
 
-data class TypedSchemaObject<T>(
+data class TypedSchema<T>(
         @field:JsonIgnore
         val clazz: Class<T>
-) : SchemaObject {
+) : Schema {
     override val schema: String
     @field:JsonIgnore
     val schemaJson: JSONObject
@@ -52,10 +52,10 @@ data class TypedSchemaObject<T>(
     }
 }
 
-data class TypedParameterSchemaObject<T>(
+data class TypedParameterSchema<T>(
         @field:JsonIgnore
         val clazz: Class<T>
-) : ParameterSchemaObject {
+) : ParameterSchema {
     override val schema: String
     @field:JsonIgnore
     val schemaJson: JSONObject
@@ -67,194 +67,194 @@ data class TypedParameterSchemaObject<T>(
     }
 }
 
-class SchemaObjectSerializer(mt: Class<SchemaObject>? = null) : StdSerializer<SchemaObject>(mt) {
-    override fun serialize(value: SchemaObject, gen: JsonGenerator, provider: SerializerProvider?) {
+class SchemaSerializer(mt: Class<Schema>? = null) : StdSerializer<Schema>(mt) {
+    override fun serialize(value: Schema, gen: JsonGenerator, provider: SerializerProvider?) {
         gen.writeRawValue(JSONObject(mapOf("schema" to mapOf("\$ref" to value.schema))).toString())
     }
 }
 
-class ParameterSchemaObjectSerializer(mt: Class<ParameterSchemaObject>? = null) : StdSerializer<ParameterSchemaObject>(mt) {
-    override fun serialize(value: ParameterSchemaObject, gen: JsonGenerator, provider: SerializerProvider?) {
+class ParameterSchemaSerializer(mt: Class<ParameterSchema>? = null) : StdSerializer<ParameterSchema>(mt) {
+    override fun serialize(value: ParameterSchema, gen: JsonGenerator, provider: SerializerProvider?) {
         gen.writeRawValue(JSONObject(mapOf("\$ref" to value.schema)).toString())
     }
 }
 
-class ComponentsObjectSerializer(mt: Class<ComponentsObject>? = null) : StdSerializer<ComponentsObject>(mt) {
-    override fun serialize(value: ComponentsObject, gen: JsonGenerator, provider: SerializerProvider?) {
+class ComponentsSerializer(mt: Class<Components>? = null) : StdSerializer<Components>(mt) {
+    override fun serialize(value: Components, gen: JsonGenerator, provider: SerializerProvider?) {
         gen.writeRawValue(JSONObject().put("schemas", value.schemas).toString())
     }
 }
 
-data class SecurityRequirementObject(
+data class SecurityRequirement(
         private var nameToRequirements: MutableMap<String, List<String>> = mutableMapOf()
 ) : MutableMap<String, List<String>> by nameToRequirements
 
-data class ParameterObject(
+data class Parameter(
         var name: String = "",
         var `in`: String = "path",
         var description: String = "",
         var required: Boolean = true,
         var style: String = "simple",
-        var schema: TypedParameterSchemaObject<*> = TypedParameterSchemaObject(String::class.java)
+        var schema: TypedParameterSchema<*> = TypedParameterSchema(String::class.java)
 ) {
     inline fun <reified T> schema() {
-        schema = TypedParameterSchemaObject(T::class.java)
+        schema = TypedParameterSchema(T::class.java)
     }
 }
 
-data class ResponseObject(
+data class Response(
         var description: String = ""
 ) {
-    val content = HashMap<String, TypedSchemaObject<*>>()
+    val content = HashMap<String, TypedSchema<*>>()
     inline fun <reified T> response(mediaType: String) {
-        val apiMediaType = TypedSchemaObject(T::class.java)
+        val apiMediaType = TypedSchema(T::class.java)
         content.put(mediaType, apiMediaType)
     }
 }
 
-data class RequestBodyObject(
-        val content: MutableMap<String, TypedSchemaObject<*>> = HashMap()
+data class RequestBody(
+        val content: MutableMap<String, TypedSchema<*>> = HashMap()
 ) {
     var description: String? = null
     inline fun <reified T> request(mediaType: String) {
-        val apiMediaType = TypedSchemaObject(T::class.java)
+        val apiMediaType = TypedSchema(T::class.java)
         content.put(mediaType, apiMediaType)
     }
 }
 
-data class ResponsesObject(
-        private val responses: MutableMap<String, ResponseObject> = HashMap()
-) : MutableMap<String, ResponseObject> by responses
+data class Responses(
+        private val responses: MutableMap<String, Response> = HashMap()
+) : MutableMap<String, Response> by responses
 
-data class OperationObject(
+data class Operation(
         var description: String = "",
         var operationId: String = "",
         var tags: List<String> = emptyList(),
         var summary: String = "",
         var deprecated: Boolean = false,
-        var servers: List<ServerObject> = emptyList(),
-        var externalDocs: ExternalDocumentationObject? = null,
-        var security: List<SecurityRequirementObject> = emptyList()
+        var servers: List<Server> = emptyList(),
+        var externalDocs: ExternalDocumentation? = null,
+        var security: List<SecurityRequirement> = emptyList()
 ) {
-    val responses = ResponsesObject()
-    var requestBody: RequestBodyObject? = null
-    var parameters: MutableList<ParameterObject>? = null
-    fun code(code: String, init: ResponseObject.() -> Unit) {
-        val response = ResponseObject()
+    val responses = Responses()
+    var requestBody: RequestBody? = null
+    var parameters: MutableList<Parameter>? = null
+    fun code(code: String, init: Response.() -> Unit) {
+        val response = Response()
         response.init()
         responses.put(code, response)
     }
 
-    fun created(init: ResponseObject.() -> Unit) = code("201", init)
-    fun ok(init: ResponseObject.() -> Unit) = code("200", init)
+    fun created(init: Response.() -> Unit) = code("201", init)
+    fun ok(init: Response.() -> Unit) = code("200", init)
 
-    fun requestBody(init: RequestBodyObject.() -> Unit) {
+    fun requestBody(init: RequestBody.() -> Unit) {
         if (requestBody == null) {
-            requestBody = RequestBodyObject()
+            requestBody = RequestBody()
             requestBody!!.init()
         }
     }
 
-    fun parameter(init: ParameterObject.() -> Unit) {
+    fun parameter(init: Parameter.() -> Unit) {
         if (parameters == null) {
-            val parameter = ParameterObject()
+            val parameter = Parameter()
             parameter.init()
             parameters = mutableListOf(parameter)
         }
     }
 }
 
-open class PathItemObject(
+open class PathItem(
         @field:JsonIgnore
-        val path: OperationObject,
+        val path: Operation,
         @field:JsonIgnore
         val jsonKey: String
 )
 
-data class PathsObject(
-        private val paths: MutableMap<String, MutableMap<String, OperationObject>> = HashMap()
-) : MutableMap<String, MutableMap<String, OperationObject>> by paths {
-    private fun makeOperationObject(init: OperationObject.() -> Unit): OperationObject {
-        val apiPath = OperationObject()
+data class Paths(
+        private val paths: MutableMap<String, MutableMap<String, Operation>> = HashMap()
+) : MutableMap<String, MutableMap<String, Operation>> by paths {
+    private fun makeOperation(init: Operation.() -> Unit): Operation {
+        val apiPath = Operation()
         apiPath.init()
         return apiPath
     }
 
-    private fun putPath(path: String, pathItemObject: PathItemObject) {
+    private fun putPath(path: String, pathItem: PathItem) {
         if (containsKey(path)) {
-            get(path)?.put(pathItemObject.jsonKey, pathItemObject.path)
+            get(path)?.put(pathItem.jsonKey, pathItem.path)
         } else {
-            put(path, mutableMapOf(pathItemObject.jsonKey to pathItemObject.path))
+            put(path, mutableMapOf(pathItem.jsonKey to pathItem.path))
         }
     }
 
-    fun get(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "get"))
+    fun get(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "get"))
     }
 
-    fun put(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "put"))
+    fun put(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "put"))
     }
 
-    fun post(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "post"))
+    fun post(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "post"))
     }
 
-    fun delete(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "delete"))
+    fun delete(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "delete"))
     }
 
-    fun patch(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "patch"))
+    fun patch(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "patch"))
     }
 
-    fun head(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "head"))
+    fun head(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "head"))
     }
 
-    fun options(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "options"))
+    fun options(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "options"))
     }
 
-    fun trace(path: String, init: OperationObject.() -> Unit) {
-        putPath(path, PathItemObject(makeOperationObject(init), "trace"))
+    fun trace(path: String, init: Operation.() -> Unit) {
+        putPath(path, PathItem(makeOperation(init), "trace"))
     }
 }
 
-data class ComponentsObject(
+data class Components(
         val schemas: Map<String, Any> = HashMap()
 )
 
-data class ExternalDocumentationObject(
+data class ExternalDocumentation(
         var url: String,
         var description: String = ""
 )
 
-data class TagObject(
+data class Tag(
         var name: String = "",
         var description: String = "",
-        var externalDocs: ExternalDocumentationObject? = null
+        var externalDocs: ExternalDocumentation? = null
 )
 
-data class ServerVariableObject(
+data class ServerVariable(
         var default: String,
         var enum: List<String> = emptyList(),
         var description: String = ""
 )
 
-data class ServerObject(
+data class Server(
         var url: String = "",
         var description: String = "",
-        val variables: Map<String, ServerVariableObject> = emptyMap()
+        val variables: Map<String, ServerVariable> = emptyMap()
 )
 
-data class OpenApiObject(
+data class OpenApi(
         var openapi: String = "3.0.0",
-        var info: InfoObject = InfoObject(),
-        var paths: PathsObject = PathsObject(),
-        var tags: List<TagObject> = emptyList(),
-        var externalDocs: ExternalDocumentationObject? = null,
-        var servers: List<ServerObject> = mutableListOf()
+        var info: Info = Info(),
+        var paths: Paths = Paths(),
+        var tags: List<Tag> = emptyList(),
+        var externalDocs: ExternalDocumentation? = null,
+        var servers: List<Server> = mutableListOf()
 ) {
     companion object {
         @field:JsonIgnore
@@ -265,13 +265,13 @@ data class OpenApiObject(
         val module = SimpleModule()
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
         mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
-        module.addSerializer(SchemaObject::class.java, SchemaObjectSerializer())
-        module.addSerializer(ParameterSchemaObject::class.java, ParameterSchemaObjectSerializer())
-        module.addSerializer(ComponentsObject::class.java, ComponentsObjectSerializer())
+        module.addSerializer(Schema::class.java, SchemaSerializer())
+        module.addSerializer(ParameterSchema::class.java, ParameterSchemaSerializer())
+        module.addSerializer(Components::class.java, ComponentsSerializer())
         mapper.registerModule(module)
     }
 
-    val components: ComponentsObject
+    val components: Components
         get() {
             val responseSchemas: Map<String, Any> = paths.values
                     .flatMap { it.values }
@@ -301,16 +301,16 @@ data class OpenApiObject(
                         m
                     }
 
-            return ComponentsObject(responseSchemas
+            return Components(responseSchemas
                     .plus(requestSchemas)
                     .plus(parameterSchemas))
         }
 
-    fun info(init: InfoObject.() -> Unit) {
+    fun info(init: Info.() -> Unit) {
         info.init()
     }
 
-    fun paths(init: PathsObject.() -> Unit) {
+    fun paths(init: Paths.() -> Unit) {
         paths.init()
     }
 
@@ -332,8 +332,8 @@ data class OpenApiObject(
     }
 }
 
-fun openapi3(init: OpenApiObject.() -> Unit): OpenApiObject {
-    val openapi3 = OpenApiObject()
+fun openapi3(init: OpenApi.() -> Unit): OpenApi {
+    val openapi3 = OpenApi()
     openapi3.init()
     return openapi3
 }
