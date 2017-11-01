@@ -16,8 +16,8 @@ import java.io.File
 import java.nio.file.Files
 
 data class Info(
-        var title: String = "",
-        var version: String = ""
+        var title: String? = null,
+        var version: String? = null
 )
 
 data class OAuthFlow(
@@ -35,13 +35,13 @@ data class OAuthFlows(
 )
 
 data class SecurityScheme(
-        var type: Type = Type.API_KEY,
-        var name: String = "",
+        var type: Type? = null,
+        var name: String? = null,
         var `in`: In = In.HEADER,
-        var scheme: String = "Bearer",
-        var description: String = "",
-        var bearerFormat: String = "",
-        var openIdConnectUrl: String = "",
+        var scheme: String? = null,
+        var description: String? = null,
+        var bearerFormat: String? = null,
+        var openIdConnectUrl: String? = null,
         var flows: OAuthFlows? = null
 ) {
     fun flows(init: OAuthFlows.() -> Unit) {
@@ -150,11 +150,11 @@ data class SecurityRequirement(
 ) : MutableMap<String, List<String>> by nameToRequirements
 
 data class Parameter(
-        var name: String = "",
+        var name: String? = null,
         var `in`: In = In.PATH,
-        var description: String = "",
+        var description: String? = null,
         var required: Boolean = true,
-        var style: String = "simple",
+        var style: String? = null,
         var schema: TypedParameterSchema<*> = TypedParameterSchema(String::class.java)
 ) {
     enum class In(val type: String = "path") {
@@ -174,7 +174,7 @@ data class Parameter(
 }
 
 data class Response(
-        var description: String = ""
+        var description: String? = null
 ) {
     val content = HashMap<String, TypedSchema<*>>()
     inline fun <reified T> response(mediaType: String) {
@@ -198,11 +198,11 @@ data class Responses(
 ) : MutableMap<String, Response> by responses
 
 data class Operation(
-        var description: String = "",
-        var operationId: String = "",
-        var tags: List<String> = emptyList(),
-        var summary: String = "",
-        var deprecated: Boolean = false,
+        var description: String? = null,
+        var operationId: String? = null,
+        var tags: List<String>? = null,
+        var summary: String? = null,
+        var deprecated: Boolean? = null,
         val servers: MutableList<Server> = mutableListOf(),
         var externalDocs: ExternalDocumentation? = null,
         val security: MutableList<SecurityRequirement> = mutableListOf()
@@ -307,38 +307,38 @@ data class Paths(
 }
 
 data class Components(
-        val schemas: Map<String, Any> = emptyMap(),
-        val securitySchemes: Map<String, SecurityScheme> = emptyMap()
+        val schemas: Map<String, Any>? = null,
+        val securitySchemes: Map<String?, SecurityScheme>? = null
 )
 
 data class ExternalDocumentation(
         var url: String,
-        var description: String = ""
+        var description: String? = null
 )
 
 data class Tag(
-        var name: String = "",
-        var description: String = "",
+        var name: String? = null,
+        var description: String? = null,
         var externalDocs: ExternalDocumentation? = null
 )
 
 data class ServerVariable(
         var default: String,
-        var enum: List<String> = emptyList(),
-        var description: String = ""
+        var enum: List<String>? = null,
+        var description: String? = null
 )
 
 data class Server(
-        var url: String = "",
-        var description: String = "",
-        var variables: Map<String, ServerVariable> = emptyMap()
+        var url: String? = null,
+        var description: String? = null,
+        var variables: Map<String, ServerVariable>? = null
 )
 
 data class OpenApi(
         var openapi: String = "3.0.0",
         var info: Info = Info(),
         var paths: Paths = Paths(),
-        var tags: List<Tag> = emptyList(),
+        var tags: List<Tag>? = null,
         var externalDocs: ExternalDocumentation? = null,
         val servers: MutableList<Server> = mutableListOf(),
         val security: MutableList<SecurityRequirement> = mutableListOf()
@@ -357,7 +357,7 @@ data class OpenApi(
         mapper.registerModule(module)
     }
 
-    private val securitySchemes: MutableMap<String, SecurityScheme> = HashMap()
+    private val securitySchemes: MutableMap<String?, SecurityScheme> = HashMap()
 
     val components: Components
         get() {

@@ -146,7 +146,7 @@ class OpenApi3BuilderTest : StringSpec() {
             //openApi3Requests.values.size shouldBe 2
             val openApi3MediaType = openApi3Response.content["application/json"]
             openApi3MediaType?.schemaJson?.getJSONObject("schema")?.getString("type") shouldBe "object"
-            api.components.schemas.values.size shouldBe 4
+            api.components.schemas?.values?.size shouldBe 4
         }
 
         "openapi should convert to valid openapi3 spec" {
@@ -160,19 +160,12 @@ class OpenApi3BuilderTest : StringSpec() {
             parse.info.version shouldBe "1.0"
         }
 
-        "openapi parameter object should convert to json" {
-            val openApi3Parameter = Parameter()
-            println(mapper.writeValueAsString(openApi3Parameter))
-        }
-
         "openapi components object should convert to json" {
             val securityScheme = SecurityScheme(name = "bar")
             println(mapper.writeValueAsString(securityScheme))
-            val schemas = mapOf("Foo" to TypedSchema(ExampleSchema::class.java))
-            val securitySchemes = mapOf(
+            val securitySchemes = mapOf<String?, SecurityScheme>(
                     "foo" to securityScheme
             )
-            val components = Components(schemas, securitySchemes)
             println(mapper.writeValueAsString(securitySchemes))
         }
 
