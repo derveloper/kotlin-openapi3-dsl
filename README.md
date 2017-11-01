@@ -28,38 +28,15 @@ compile "cc.vileda:kotlin-openapi3-dsl:0.15.3"
 
 for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt)
 
-### minimal example 
-
-```kotlin
-data class HelloResponse(
-        val message: String
-)
-
-val spec = openapi3 {
-    info {
-        title = "test api"
-        version = "0.0.1"
-    }
-
-    paths {
-        get("/hello") {
-            operationId = "hello"
-            code("200") {
-                response<HelloResponse>("application/json")
-            }
-        }
-    }
-}
-```
 
 ### complete vertx.io example
 
 ```kotlin
-import cc.vileda.openapi3.SecurityScheme
-import cc.vileda.openapi3.openapi3
+import cc.vileda.openapi.dsl.*
+import io.swagger.oas.models.examples.Example
+import io.swagger.oas.models.security.SecurityScheme
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject.mapFrom
-import io.vertx.ext.web.api.RequestParameters
 import io.vertx.kotlin.core.http.HttpServerOptions
 import io.vertx.reactivex.core.Vertx
 import io.vertx.reactivex.ext.web.Router
@@ -76,16 +53,18 @@ data class HelloRequest(
         val message: String
 )
 
-private val api3 = openapi3 {
+private val api3 = openapiDsl {
     info {
         title = "test api"
         version = "0.0.1"
     }
 
-    securityScheme {
-        name = "apiKey"
-        type = SecurityScheme.Type.API_KEY
-        `in` = SecurityScheme.In.HEADER
+    components {
+        securityScheme {
+            name = "apiKey"
+            type = SecurityScheme.Type.APIKEY
+            `in` = SecurityScheme.In.HEADER
+        }
     }
 
     security {
@@ -93,48 +72,54 @@ private val api3 = openapi3 {
     }
 
     paths {
-        get("/hello") {
-            tags = listOf("without params")
-            operationId = "hello"
-            description = "hello get"
-            ok {
-                description = "a 200 response"
-                response<HelloResponse>("application/json")
-            }
-            code("401") {
-                description = "apiKey invalid"
-            }
-            security {
-                put("apiKey", emptyList())
-            }
-        }
-
-        get("/hello/{name}") {
-            tags = listOf("with params")
-            operationId = "helloName"
-            description = "hello get"
-            parameter {
-                name = "name"
-                schema<String>()
-            }
-            ok {
-                description = "a 200 response"
-                response<HelloResponse>("application/json")
-            }
-        }
-
-        post("/hello") {
-            tags = listOf("without params")
-            operationId = "postHello"
-            description = "hello post"
-            created {
-                description = "a 200 response"
-                requestBody {
-                    description = "example request"
-                    request<HelloRequest>("application/json")
-                    request<HelloRequest>("application/xml")
+        path("/hello") {
+            get {
+                tags = listOf("without params")
+                operationId = "hello"
+                description = "hello get"
+                responses {
+                    response("200") {
+                        description = "a 200 response"
+                        content {
+                            mediaType<HelloResponse>("application/json") {
+                                description = "Hello response"
+                                example = HelloResponse("World")
+                            }
+                        }
+                    }
                 }
-                response<HelloResponse>("application/json")
+            }
+            post {
+                tags = listOf("without params")
+                operationId = "postHello"
+                description = "hello post"
+                responses {
+                    response("201") {
+                        description = "created response"
+                        requestBody {
+                            content {
+                                mediaType<HelloRequest>("application/json") {
+                                    description = "Hello request"
+                                    val ex = HelloRequest("World")
+                                    val exx = Example().apply {
+                                        value = ex
+                                        description = "example request"
+                                    }
+                                    examples = mapOf(
+                                            "HelloRequest" to exx
+                                    )
+                                    example = ex
+                                }
+                            }
+                        }
+                        content {
+                            mediaType<HelloResponse>("application/json") {
+                                description = "Hello response"
+                                example = HelloResponse("World")
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -191,14 +176,6 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
         routingContext.response()
                 .putHeader("Content-Type", "application/json")
                 .end(mapFrom(HelloResponse("Hello World!")).encode())
-    })
-
-    routerFactory.addHandlerByOperationId("helloName", { routingContext ->
-        val params: RequestParameters = routingContext.get("parsedParameters")
-        val name = params.pathParameter("name").string
-        routingContext.response()
-                .putHeader("Content-Type", "application/json")
-                .end(mapFrom(HelloResponse("Hello $name!")).encode())
     })
 
     routerFactory.addFailureHandlerByOperationId("hello", { routingContext ->
