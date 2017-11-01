@@ -173,7 +173,7 @@ inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Uni
     val mediaType = MediaType()
     mediaType.init()
     val modelSchema = ModelConverters.getInstance().read(T::class.java)
-    mediaType.schema = modelSchema["ExampleSchema"]
+    mediaType.schema = modelSchema[T::class.java.simpleName]
     addMediaType(name, mediaType)
 }
 
