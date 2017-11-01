@@ -5,6 +5,7 @@ import io.swagger.oas.models.*
 import io.swagger.oas.models.info.Info
 import io.swagger.oas.models.media.Content
 import io.swagger.oas.models.media.MediaType
+import io.swagger.oas.models.parameters.RequestBody
 import io.swagger.oas.models.responses.ApiResponse
 import io.swagger.oas.models.responses.ApiResponses
 import io.swagger.oas.models.security.SecurityRequirement
@@ -145,6 +146,11 @@ fun PathItem.trace(init: Operation.() -> Unit) {
 fun Operation.responses(init: ApiResponses.() -> Unit) {
     responses = ApiResponses()
     responses.init()
+}
+
+fun Operation.requestBody(init: RequestBody.() -> Unit) {
+    requestBody = RequestBody()
+    requestBody.init()
 }
 
 fun ApiResponses.response(name: String, init: ApiResponse.() -> Unit) {
