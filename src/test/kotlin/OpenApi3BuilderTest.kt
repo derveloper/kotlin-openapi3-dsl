@@ -21,7 +21,7 @@ class OpenApi3BuilderTest : StringSpec() {
             }
             securityScheme {
                 name = "foo"
-                type = "openIdConnect"
+                type = SecurityScheme.Type.OPEN_ID_CONNECT
                 openIdConnectUrl = "http://localhost/auth"
             }
             security {

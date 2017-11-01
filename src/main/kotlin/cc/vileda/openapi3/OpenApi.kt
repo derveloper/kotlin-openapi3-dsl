@@ -3,6 +3,7 @@ package cc.vileda.openapi3
 import cc.vileda.openapi3.OpenApi.Companion.mapper
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializerProvider
@@ -20,14 +21,38 @@ data class Info(
 )
 
 data class SecurityScheme(
-        var type: String = "apiKey",
+        var type: Type = Type.API_KEY,
         var name: String = "",
-        var `in`: String = "header",
+        var `in`: In = In.HEADER,
         var scheme: String = "Bearer",
         var description: String = "",
         var bearerFormat: String = "",
         var openIdConnectUrl: String = ""
-)
+) {
+    enum class Type(val type: String) {
+        HTTP("http"),
+        API_KEY("apiKey"),
+        OAUTH2("oauth2"),
+        OPEN_ID_CONNECT("openIdConnect");
+
+        @JsonValue
+        override fun toString(): String {
+            return type
+        }
+
+    }
+
+    enum class In(val type: String) {
+        QUERY("query"),
+        HEADER("header"),
+        COOKIE("cookie");
+
+        @JsonValue
+        override fun toString(): String {
+            return type
+        }
+    }
+}
 
 interface Schema {
     val schema: String
