@@ -125,7 +125,8 @@ data class OpenApi3Responses(
 data class OpenApi3Path(
         var description: String = "",
         var operationId: String = "",
-        var tags: List<String> = emptyList()
+        var tags: List<String> = emptyList(),
+        var summary: String = ""
 ) {
     val responses = OpenApi3Responses()
     var requestBody: OpenApi3RequestBodies? = null
@@ -154,7 +155,6 @@ data class OpenApi3Path(
         }
     }
 }
-
 
 open class OpenApi3MethodPath(
         @field:JsonIgnore
