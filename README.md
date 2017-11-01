@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     ...
-    compile "cc.vileda:kotlin-openapi3-dsl:0.0.7"
+    compile "cc.vileda:kotlin-openapi3-dsl:0.0.8"
     ...
 }
 ```
