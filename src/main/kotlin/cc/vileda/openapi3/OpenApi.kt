@@ -29,7 +29,7 @@ data class SecurityScheme(
         var bearerFormat: String = "",
         var openIdConnectUrl: String = ""
 ) {
-    enum class Type(val type: String) {
+    enum class Type(val type: String = "apiKey") {
         HTTP("http"),
         API_KEY("apiKey"),
         OAUTH2("oauth2"),
@@ -42,7 +42,7 @@ data class SecurityScheme(
 
     }
 
-    enum class In(val type: String) {
+    enum class In(val type: String = "header") {
         QUERY("query"),
         HEADER("header"),
         COOKIE("cookie");
@@ -136,7 +136,7 @@ data class Parameter(
         var style: String = "simple",
         var schema: TypedParameterSchema<*> = TypedParameterSchema(String::class.java)
 ) {
-    enum class In(val type: String) {
+    enum class In(val type: String = "path") {
         QUERY("query"),
         HEADER("header"),
         COOKIE("cookie"),
@@ -144,7 +144,7 @@ data class Parameter(
 
         @JsonValue
         override fun toString(): String {
-            return "In(type='$type')"
+            return type
         }
     }
     inline fun <reified T> schema() {
