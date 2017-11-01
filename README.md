@@ -170,7 +170,7 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
        - [ ] examples
        - [ ] complete features
     - [ ] parameters
-      - [ ] minimal features
+      - [x] minimal features
       - [ ] complete features
   - [x] components
   - [x] $ref to components
