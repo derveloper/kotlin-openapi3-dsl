@@ -1,5 +1,5 @@
 group 'cc.vileda'
-version '0.0.8'
+version '0.0.9'
 
 buildscript {
     ext.kotlin_version = '1.1.51'
@@ -129,6 +129,16 @@ bintray {
         vcsUrl = 'https://github.com/derveloper/kotlin-openapi3-dsl.git'
         version {
             name = project.version
+            gpg {
+                sign = true
+                passphrase = project.hasProperty('gpgPass') ? project.property('gpgPass') : (System.getenv('GPG_PASS') != null ? System.getenv('GPG_PASS') : "")
+            }
+            mavenCentralSync {
+                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
+                user = project.hasProperty('sonaAccessUser') ? project.property('sonaAccessUser') : (System.getenv('SONA_ACCESS_USER') != null ? System.getenv('SONA_ACCESS_USER') : "")
+                password = project.hasProperty('sonaAccessToken') ? project.property('sonaAccessToken') : (System.getenv('SONA_ACCESS_TOKEN') != null ? System.getenv('SONA_ACCESS_TOKEN') : "")
+                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
+            }
         }
     }
 }
