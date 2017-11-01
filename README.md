@@ -14,6 +14,15 @@ currently kotlin-openapi3-dsl is available on bintray
 compile "cc.vileda:kotlin-openapi3-dsl:0.0.10"
 ```
 
+### maven
+```xml
+<dependency>
+    <groupId>cc.vileda</groupId>
+    <artifactId>kotlin-openapi3-dsl</artifactId>
+    <version>0.0.10</version>
+</dependency>
+```
+
 ## example
 
 for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt)
