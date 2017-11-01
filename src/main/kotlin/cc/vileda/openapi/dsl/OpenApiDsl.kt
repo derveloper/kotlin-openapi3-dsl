@@ -164,6 +164,11 @@ fun ApiResponse.content(init: Content.() -> Unit) {
     content.init()
 }
 
+fun RequestBody.content(init: Content.() -> Unit) {
+    content = Content()
+    content.init()
+}
+
 inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Unit) {
     val mediaType = MediaType()
     mediaType.init()
