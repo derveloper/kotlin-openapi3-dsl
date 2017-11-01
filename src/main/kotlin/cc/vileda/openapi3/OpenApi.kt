@@ -19,6 +19,16 @@ data class Info(
         var version: String = ""
 )
 
+data class SecurityScheme(
+        var type: String = "apiKey",
+        var name: String = "",
+        var `in`: String = "header",
+        var scheme: String = "Bearer",
+        var description: String = "",
+        var bearerFormat: String = "",
+        var openIdConnectUrl: String = ""
+)
+
 interface Schema {
     val schema: String
 }
@@ -81,7 +91,11 @@ class ParameterSchemaSerializer(mt: Class<ParameterSchema>? = null) : StdSeriali
 
 class ComponentsSerializer(mt: Class<Components>? = null) : StdSerializer<Components>(mt) {
     override fun serialize(value: Components, gen: JsonGenerator, provider: SerializerProvider?) {
-        gen.writeRawValue(JSONObject().put("schemas", value.schemas).toString())
+        val obj = JSONObject().apply {
+            put("schemas", JSONObject(value.schemas))
+            put("securitySchemes", JSONObject(mapper.writeValueAsString(value.securitySchemes)))
+        }
+        gen.writeRawValue(obj.toString())
     }
 }
 
@@ -168,6 +182,12 @@ data class Operation(
         server.init()
         servers.add(server)
     }
+
+    fun security(init: SecurityRequirement.() -> Unit) {
+        val server = SecurityRequirement()
+        server.init()
+        security.add(server)
+    }
 }
 
 open class PathItem(
@@ -228,7 +248,8 @@ data class Paths(
 }
 
 data class Components(
-        val schemas: Map<String, Any> = HashMap()
+        val schemas: Map<String, Any> = emptyMap(),
+        val securitySchemes: Map<String, SecurityScheme> = emptyMap()
 )
 
 data class ExternalDocumentation(
@@ -278,6 +299,8 @@ data class OpenApi(
         mapper.registerModule(module)
     }
 
+    private val securitySchemes: MutableMap<String, SecurityScheme> = HashMap()
+
     val components: Components
         get() {
             val responseSchemas: Map<String, Any> = paths.values
@@ -308,9 +331,10 @@ data class OpenApi(
                         m
                     }
 
-            return Components(responseSchemas
+            val schemas = responseSchemas
                     .plus(requestSchemas)
-                    .plus(parameterSchemas))
+                    .plus(parameterSchemas)
+            return Components(schemas, securitySchemes)
         }
 
     fun info(init: Info.() -> Unit) {
@@ -327,10 +351,16 @@ data class OpenApi(
         servers.add(server)
     }
 
+    fun securityScheme(init: SecurityScheme.() -> Unit) {
+        val security = SecurityScheme()
+        security.init()
+        securitySchemes.put(security.name, security)
+    }
+
     fun security(init: SecurityRequirement.() -> Unit) {
-        val server = SecurityRequirement()
-        server.init()
-        security.add(server)
+        val securityReq = SecurityRequirement()
+        securityReq.init()
+        security.add(securityReq)
     }
 
     private fun toJson(): JSONObject {

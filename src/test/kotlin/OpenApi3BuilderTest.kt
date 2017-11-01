@@ -4,6 +4,7 @@ import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
+import org.json.JSONObject
 
 data class ExampleSchema(val foo: String)
 data class AnotherExampleSchema(val bar: String)
@@ -17,6 +18,14 @@ class OpenApi3BuilderTest : StringSpec() {
                 url = "http://localhost"
                 description = "localhost server"
                 variables = mapOf("foo" to ServerVariable("bar"))
+            }
+            securityScheme {
+                name = "foo"
+                type = "openIdConnect"
+                openIdConnectUrl = "http://localhost/auth"
+            }
+            security {
+                put("foo", listOf("bar"))
             }
             info {
                 title = "jjjj"
@@ -151,6 +160,21 @@ class OpenApi3BuilderTest : StringSpec() {
         "openapi parameter object should convert to json" {
             val openApi3Parameter = Parameter()
             println(mapper.writeValueAsString(openApi3Parameter))
+        }
+
+        "openapi components object should convert to json" {
+            val securityScheme = SecurityScheme(name = "bar")
+            println(mapper.writeValueAsString(securityScheme))
+            val schemas = mapOf("Foo" to TypedSchema(ExampleSchema::class.java))
+            val securitySchemes = mapOf(
+                    "foo" to securityScheme
+            )
+            val components = Components(schemas, securitySchemes)
+            println(mapper.writeValueAsString(securitySchemes))
+        }
+
+        "openapi object converts to json" {
+            println(JSONObject(mapper.writeValueAsString(api)).toString(2))
         }
     }
 }
