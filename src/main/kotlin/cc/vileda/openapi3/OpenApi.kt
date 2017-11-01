@@ -20,6 +20,20 @@ data class Info(
         var version: String = ""
 )
 
+data class OAuthFlow(
+        var authorizationUrl: String,
+        var tokenUrl: String,
+        var scopes: Map<String, String>,
+        var refreshUrl: String? = null
+)
+
+data class OAuthFlows(
+        var implicit: OAuthFlow? = null,
+        var password: OAuthFlow? = null,
+        var clientCredentials: OAuthFlow? = null,
+        var authorizationCode: OAuthFlow? = null
+)
+
 data class SecurityScheme(
         var type: Type = Type.API_KEY,
         var name: String = "",
@@ -27,8 +41,15 @@ data class SecurityScheme(
         var scheme: String = "Bearer",
         var description: String = "",
         var bearerFormat: String = "",
-        var openIdConnectUrl: String = ""
+        var openIdConnectUrl: String = "",
+        var flows: OAuthFlows? = null
 ) {
+    fun flows(init: OAuthFlows.() -> Unit) {
+        val oAuthFlows = OAuthFlows()
+        oAuthFlows.init()
+        flows = oAuthFlows
+    }
+
     enum class Type(val type: String = "apiKey") {
         HTTP("http"),
         API_KEY("apiKey"),

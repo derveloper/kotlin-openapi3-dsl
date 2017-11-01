@@ -23,6 +23,9 @@ class OpenApi3BuilderTest : StringSpec() {
                 name = "foo"
                 type = SecurityScheme.Type.OPEN_ID_CONNECT
                 openIdConnectUrl = "http://localhost/auth"
+                flows {
+                    implicit = OAuthFlow("", "", emptyMap())
+                }
             }
             security {
                 put("foo", listOf("bar"))

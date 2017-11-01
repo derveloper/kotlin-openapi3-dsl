@@ -81,7 +81,7 @@ private val api3 = openapi3 {
         get("/hello") {
             operationId = "hello"
             description = "hello get"
-            code("200") {
+            ok {
                 description = "a 200 response"
                 response<HelloResponse>("application/json")
             }
@@ -90,8 +90,8 @@ private val api3 = openapi3 {
         post("/hello") {
             operationId = "postHello"
             description = "hello post"
-            code("200") {
-                description = "a 200 response"
+            created {
+                description = "a 201 response"
                 requestBody {
                     description = "example request"
                     request<HelloRequest>("application/json")
@@ -164,6 +164,7 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
   - [ ] paths
     - [x] all HTTP methods
     - [x] minimal features
+    - [x] security features
     - [ ] complete features
     - [ ] requestBody
        - [x] minimal features
