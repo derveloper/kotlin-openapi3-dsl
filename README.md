@@ -6,7 +6,7 @@ Build your OpenApi3 spec in kotlin!
 
 ## import
 
-currently kotlin-openapi3-dsl is available on bintray
+kotlin-openapi3-dsl is available on maven central
 
 ### gradle
 
