@@ -197,6 +197,8 @@ data class Operation(
 
     fun created(init: Response.() -> Unit) = code("201", init)
     fun ok(init: Response.() -> Unit) = code("200", init)
+    fun unauthorized(init: Response.() -> Unit) = code("401", init)
+    fun forbidden(init: Response.() -> Unit) = code("403", init)
 
     fun requestBody(init: RequestBody.() -> Unit) {
         if (requestBody == null) {
