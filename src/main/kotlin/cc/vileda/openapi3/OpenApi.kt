@@ -130,12 +130,23 @@ data class SecurityRequirement(
 
 data class Parameter(
         var name: String = "",
-        var `in`: String = "path",
+        var `in`: In = In.PATH,
         var description: String = "",
         var required: Boolean = true,
         var style: String = "simple",
         var schema: TypedParameterSchema<*> = TypedParameterSchema(String::class.java)
 ) {
+    enum class In(val type: String) {
+        QUERY("query"),
+        HEADER("header"),
+        COOKIE("cookie"),
+        PATH("path");
+
+        @JsonValue
+        override fun toString(): String {
+            return "In(type='$type')"
+        }
+    }
     inline fun <reified T> schema() {
         schema = TypedParameterSchema(T::class.java)
     }
