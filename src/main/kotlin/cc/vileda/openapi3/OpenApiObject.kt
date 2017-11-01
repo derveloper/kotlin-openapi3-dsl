@@ -260,7 +260,8 @@ data class OpenApi(
         var paths: Paths = Paths(),
         var tags: List<Tag> = emptyList(),
         var externalDocs: ExternalDocumentation? = null,
-        var servers: List<Server> = mutableListOf()
+        val servers: MutableList<Server> = mutableListOf(),
+        val security: MutableList<SecurityRequirement> = mutableListOf()
 ) {
     companion object {
         @field:JsonIgnore
@@ -318,6 +319,18 @@ data class OpenApi(
 
     fun paths(init: Paths.() -> Unit) {
         paths.init()
+    }
+
+    fun server(init: Server.() -> Unit) {
+        val server = Server()
+        server.init()
+        servers.add(server)
+    }
+
+    fun security(init: SecurityRequirement.() -> Unit) {
+        val server = SecurityRequirement()
+        server.init()
+        security.add(server)
     }
 
     private fun toJson(): JSONObject {

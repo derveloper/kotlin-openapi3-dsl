@@ -13,6 +13,11 @@ class OpenApi3BuilderTest : StringSpec() {
     init {
         val api = openapi3 {
             openapi = "3.0.0"
+            server {
+                url = "http://localhost"
+                description = "localhost server"
+                variables = mapOf("foo" to ServerVariable("bar"))
+            }
             info {
                 title = "jjjj"
                 version = "1.0"
