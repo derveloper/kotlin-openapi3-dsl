@@ -13,9 +13,7 @@ currently kotlin-openapi3-dsl is available on bintray
 ```groovy
 repositories {
     ...
-    maven {
-        url  "https://dl.bintray.com/vileda/maven"
-    }
+    jcenter()
     ...
 }
 
@@ -178,7 +176,7 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
   - [x] components
   - [x] $ref to components
 - [x] Publish on bintray
-- [ ] Publish on jcenter
+- [x] Publish on jcenter
 - [ ] Publish on maven central
 
 
