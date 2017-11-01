@@ -1,5 +1,5 @@
 group 'cc.vileda'
-version '0.0.13'
+version '0.0.14'
 
 buildscript {
     ext.kotlin_version = '1.1.51'
