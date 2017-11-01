@@ -328,7 +328,6 @@ data class OpenApi(
     init {
         val module = SimpleModule()
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
         module.addSerializer(Schema::class.java, SchemaSerializer())
         module.addSerializer(ParameterSchema::class.java, ParameterSchemaSerializer())
         module.addSerializer(Components::class.java, ComponentsSerializer())
