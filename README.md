@@ -19,7 +19,7 @@ compile "cc.vileda:kotlin-openapi3-dsl:0.14.1"
 <dependency>
     <groupId>cc.vileda</groupId>
     <artifactId>kotlin-openapi3-dsl</artifactId>
-    <version>0.0.10</version>
+    <version>0.14.1</version>
 </dependency>
 ```
 
