@@ -13,11 +13,27 @@ import io.swagger.oas.models.servers.Server
 import io.swagger.oas.models.servers.ServerVariable
 import io.swagger.oas.models.servers.ServerVariables
 import io.swagger.oas.models.tags.Tag
+import io.swagger.util.Json
+import org.json.JSONObject
+import java.io.File
+import java.nio.file.Files
 
 fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
     val openapi3 = OpenAPI()
     openapi3.init()
     return openapi3
+}
+
+fun OpenAPI.asJson(): JSONObject {
+    val stringSpec = Json.mapper().writeValueAsString(this)
+    return JSONObject(stringSpec)
+}
+
+fun OpenAPI.asFile(): File {
+    val file = Files.createTempFile("openapi-", ".json").toFile()
+    file.writeText(asJson().toString())
+    file.deleteOnExit()
+    return file
 }
 
 fun OpenAPI.info(init: Info.() -> Unit) {
