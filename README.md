@@ -11,17 +11,7 @@ currently kotlin-openapi3-dsl is available on bintray
 ### gradle
 
 ```groovy
-repositories {
-    ...
-    jcenter()
-    ...
-}
-
-dependencies {
-    ...
-    compile "cc.vileda:kotlin-openapi3-dsl:0.0.10"
-    ...
-}
+compile "cc.vileda:kotlin-openapi3-dsl:0.0.10"
 ```
 
 ## example
@@ -177,7 +167,7 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
   - [x] $ref to components
 - [x] Publish on bintray
 - [x] Publish on jcenter
-- [ ] Publish on maven central
+- [x] Publish on maven central
 
 
 ## license
