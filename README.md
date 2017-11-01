@@ -54,7 +54,11 @@ val spec = openapi3 {
 ### complete vertx.io example
 
 ```kotlin
+import cc.vileda.openapi3.SecurityScheme
+import cc.vileda.openapi3.openapi3
+import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject.mapFrom
+import io.vertx.ext.web.api.RequestParameters
 import io.vertx.kotlin.core.http.HttpServerOptions
 import io.vertx.reactivex.core.Vertx
 import io.vertx.reactivex.ext.web.Router
@@ -77,10 +81,41 @@ private val api3 = openapi3 {
         version = "0.0.1"
     }
 
+    securityScheme {
+        name = "apiKey"
+        type = SecurityScheme.Type.API_KEY
+        `in` = SecurityScheme.In.HEADER
+    }
+
+    security {
+        put("apiKey", emptyList())
+    }
+
     paths {
         get("/hello") {
+            tags = listOf("without params")
             operationId = "hello"
             description = "hello get"
+            ok {
+                description = "a 200 response"
+                response<HelloResponse>("application/json")
+            }
+            code("401") {
+                description = "apiKey invalid"
+            }
+            security {
+                put("apiKey", emptyList())
+            }
+        }
+
+        get("/hello/{name}") {
+            tags = listOf("with params")
+            operationId = "helloName"
+            description = "hello get"
+            parameter {
+                name = "name"
+                schema<String>()
+            }
             ok {
                 description = "a 200 response"
                 response<HelloResponse>("application/json")
@@ -88,10 +123,11 @@ private val api3 = openapi3 {
         }
 
         post("/hello") {
+            tags = listOf("without params")
             operationId = "postHello"
             description = "hello post"
             created {
-                description = "a 201 response"
+                description = "a 200 response"
                 requestBody {
                     description = "example request"
                     request<HelloRequest>("application/json")
@@ -126,7 +162,8 @@ fun startServer(routerFactory: OpenAPI3RouterFactory) {
 fun bindAdditionalHandlers(router: Router) {
     val create = CorsHandler.create("^.*$")
             .allowedHeaders(setOf(
-                    "Content-Type"
+                    "Content-Type",
+                    "apiKey"
             ))
     router.route().handler(create)
 
@@ -138,6 +175,11 @@ fun bindAdditionalHandlers(router: Router) {
 }
 
 private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
+    routerFactory.addSecurityHandler("apiKey", Handler {
+        if (it.request().getHeader("apiKey") == "foo") it.next()
+        else it.fail(401)
+    })
+
     routerFactory.addHandlerByOperationId("postHello", { routingContext ->
         routingContext.response()
                 .putHeader("Content-Type", "application/json")
@@ -148,6 +190,14 @@ private fun createOperationHandlers(routerFactory: OpenAPI3RouterFactory) {
         routingContext.response()
                 .putHeader("Content-Type", "application/json")
                 .end(mapFrom(HelloResponse("Hello World!")).encode())
+    })
+
+    routerFactory.addHandlerByOperationId("helloName", { routingContext ->
+        val params: RequestParameters = routingContext.get("parsedParameters")
+        val name = params.pathParameter("name").string
+        routingContext.response()
+                .putHeader("Content-Type", "application/json")
+                .end(mapFrom(HelloResponse("Hello $name!")).encode())
     })
 
     routerFactory.addFailureHandlerByOperationId("hello", { routingContext ->
