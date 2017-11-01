@@ -11,7 +11,7 @@ kotlin-openapi3-dsl is available on maven central
 ### gradle
 
 ```groovy
-compile "cc.vileda:kotlin-openapi3-dsl:0.0.15"
+compile "cc.vileda:kotlin-openapi3-dsl:0.14.1"
 ```
 
 ### maven
