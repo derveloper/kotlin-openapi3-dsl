@@ -132,9 +132,9 @@ data class Operation(
         var tags: List<String> = emptyList(),
         var summary: String = "",
         var deprecated: Boolean = false,
-        var servers: List<Server> = emptyList(),
+        val servers: MutableList<Server> = mutableListOf(),
         var externalDocs: ExternalDocumentation? = null,
-        var security: List<SecurityRequirement> = emptyList()
+        val security: MutableList<SecurityRequirement> = mutableListOf()
 ) {
     val responses = Responses()
     var requestBody: RequestBody? = null
@@ -161,6 +161,12 @@ data class Operation(
             parameter.init()
             parameters = mutableListOf(parameter)
         }
+    }
+
+    fun server(init: Server.() -> Unit) {
+        val server = Server()
+        server.init()
+        servers.add(server)
     }
 }
 
@@ -245,7 +251,7 @@ data class ServerVariable(
 data class Server(
         var url: String = "",
         var description: String = "",
-        val variables: Map<String, ServerVariable> = emptyMap()
+        var variables: Map<String, ServerVariable> = emptyMap()
 )
 
 data class OpenApi(

@@ -1,8 +1,5 @@
+import cc.vileda.openapi3.*
 import cc.vileda.openapi3.OpenApi.Companion.mapper
-import cc.vileda.openapi3.Operation
-import cc.vileda.openapi3.Parameter
-import cc.vileda.openapi3.Response
-import cc.vileda.openapi3.openapi3
 import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
@@ -24,6 +21,11 @@ class OpenApi3BuilderTest : StringSpec() {
                 get("/path") {
                     tags = listOf("foo", "bar")
                     description = "fooo"
+                    server {
+                        url = "http://localhost"
+                        description = "localhost server"
+                        variables = mapOf("foo" to ServerVariable("bar"))
+                    }
                     ok {
                         description = "some response"
                         response<ExampleSchema>("application/json")
