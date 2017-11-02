@@ -214,7 +214,10 @@ inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Uni
 }
 
 inline fun <reified T> Content.mediaType(name: String) {
-    mediaType<T>(name) { /* noop */ }
+    val mediaType = MediaType()
+    val modelSchema = ModelConverters.getInstance().read(T::class.java)
+    mediaType.schema = modelSchema[T::class.java.simpleName]
+    addMediaType(name, mediaType)
 }
 
 inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
