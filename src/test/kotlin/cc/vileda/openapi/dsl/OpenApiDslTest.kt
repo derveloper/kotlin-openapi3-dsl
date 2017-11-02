@@ -16,6 +16,14 @@ class OpenApi3BuilderTest : StringSpec() {
     init {
         val api = openapiDsl {
             openapi = "3.0.0"
+            tag {
+                name = "example_tag"
+                description = "an example tag"
+            }
+            externalDocs {
+                description = "developer hub"
+                url = "http://hub.api"
+            }
             server {
                 url = "http://localhost"
                 description = "localhost server"
@@ -24,6 +32,9 @@ class OpenApi3BuilderTest : StringSpec() {
                         addEnumItem("bar")
                     }
                 }
+            }
+            extensions {
+                put("x-stable", true)
             }
             components {
                 securityScheme {
