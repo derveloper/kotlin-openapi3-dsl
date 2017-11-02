@@ -202,7 +202,7 @@ inline fun <reified T> Parameter.schema(init: Schema<*>.() -> Unit) {
 }
 
 inline fun <reified T> Parameter.schema() {
-    schema<T> { /* noop */ }
+    schema = ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
 }
 
 inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Unit) {
