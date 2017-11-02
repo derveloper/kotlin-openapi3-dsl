@@ -6,6 +6,8 @@ import io.swagger.oas.models.examples.Example
 import io.swagger.oas.models.info.Info
 import io.swagger.oas.models.media.Content
 import io.swagger.oas.models.media.MediaType
+import io.swagger.oas.models.media.Schema
+import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.parameters.RequestBody
 import io.swagger.oas.models.responses.ApiResponse
 import io.swagger.oas.models.responses.ApiResponses
@@ -154,6 +156,15 @@ fun Operation.requestBody(init: RequestBody.() -> Unit) {
     requestBody.init()
 }
 
+fun Operation.parameter(init: Parameter.() -> Unit) {
+    if (parameters == null) {
+        parameters = mutableListOf()
+    }
+    val parameter = Parameter()
+    parameter.init()
+    parameters.add(parameter)
+}
+
 fun ApiResponses.response(name: String, init: ApiResponse.() -> Unit) {
     val response = ApiResponse()
     response.init()
@@ -170,12 +181,30 @@ fun RequestBody.content(init: Content.() -> Unit) {
     content.init()
 }
 
+fun Parameter.content(init: Content.() -> Unit) {
+    content = Content()
+    content.init()
+}
+
+inline fun <reified T> Parameter.schema(init: Schema<*>.() -> Unit) {
+    schema = ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
+    schema.init()
+}
+
+inline fun <reified T> Parameter.schema() {
+    schema<T> { /* noop */ }
+}
+
 inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Unit) {
     val mediaType = MediaType()
     mediaType.init()
     val modelSchema = ModelConverters.getInstance().read(T::class.java)
     mediaType.schema = modelSchema[T::class.java.simpleName]
     addMediaType(name, mediaType)
+}
+
+inline fun <reified T> Content.mediaType(name: String) {
+    mediaType<T>(name) { /* noop */ }
 }
 
 inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {

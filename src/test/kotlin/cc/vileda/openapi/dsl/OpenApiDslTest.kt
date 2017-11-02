@@ -1,11 +1,11 @@
 package cc.vileda.openapi.dsl
 
+import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
+import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.security.SecurityScheme
-import io.swagger.util.Json
-import org.json.JSONObject
 
 
 data class ExampleSchema(val foo: String)
@@ -41,9 +41,44 @@ class OpenApi3BuilderTest : StringSpec() {
             }
             paths {
                 path("foo") {
-                    get {
+                    post {
                         description = "test"
                         tags = listOf("tag1")
+                        parameter {
+                            name = "id"
+                            `in` = "path"
+                            style = Parameter.StyleEnum.SIMPLE
+                            schema<String>()
+                        }
+                        parameter {
+                            name = "name"
+                            `in` = "query"
+                            style = Parameter.StyleEnum.SIMPLE
+                            required = true
+                            schema<String>()
+                        }
+                        parameter {
+                            name = "firstname"
+                            `in` = "query"
+                            style = Parameter.StyleEnum.DEEPOBJECT
+                            required = false
+                            deprecated = true
+                            content {
+                                mediaType<ExampleSchema>("application/json")
+                            }
+                        }
+                        requestBody {
+                            description = "example request"
+                            required = true
+                            content {
+                                mediaType<ExampleRequestSchema>("application/json") {
+                                    description = "request schema"
+                                    example(ExampleRequestSchema("bar")) {
+                                        description = "example schema value"
+                                    }
+                                }
+                            }
+                        }
                         responses {
                             response("foo") {
                                 description = "bar"
@@ -72,9 +107,11 @@ class OpenApi3BuilderTest : StringSpec() {
             api.info.version shouldBe "1.0"
         }
 
-        "openapi should render as json" {
-            val stringSpec = Json.mapper().writeValueAsString(api)
-            println(JSONObject(stringSpec).toString(2))
+        "openapi should render as valid json spec" {
+            val asJson = api.asJson()
+            println(asJson.toString(2))
+            val parsed = OpenApi3Parser().parse(api.asFile())
+            parsed.validationItems.size shouldBe 0
         }
     }
 }
