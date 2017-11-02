@@ -26,7 +26,7 @@ compile "cc.vileda:kotlin-openapi3-dsl:0.15.3"
 
 ## example
 
-for a complete example [look at the test](src/test/kotlin/OpenApi3BuilderTest.kt)
+for a complete example [look at the test](src/test/kotlin/cc/vileda/openapi/dsl/OpenApiDslTest.kt)
 
 
 ### complete vertx.io example
