@@ -1,5 +1,6 @@
 package cc.vileda.openapi.dsl
 
+import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.swagger.converter.ModelConverters
 import io.swagger.oas.models.*
 import io.swagger.oas.models.examples.Example
@@ -28,14 +29,23 @@ fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
     return openapi3
 }
 
+internal fun validatedJson(api: OpenAPI): JSONObject {
+    val json = Json.mapper().writeValueAsString(api)
+    OpenApi3Parser().parse(toFile(json), true)
+    return JSONObject(json)
+}
+
 fun OpenAPI.asJson(): JSONObject {
-    val stringSpec = Json.mapper().writeValueAsString(this)
-    return JSONObject(stringSpec)
+    return validatedJson(this)
 }
 
 fun OpenAPI.asFile(): File {
+    return toFile(asJson().toString(2))
+}
+
+private fun toFile(json: String): File {
     val file = Files.createTempFile("openapi-", ".json").toFile()
-    file.writeText(asJson().toString())
+    file.writeText(json)
     file.deleteOnExit()
     return file
 }

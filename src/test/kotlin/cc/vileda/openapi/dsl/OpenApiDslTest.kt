@@ -1,6 +1,5 @@
 package cc.vileda.openapi.dsl
 
-import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
@@ -119,10 +118,8 @@ class OpenApi3BuilderTest : StringSpec() {
         }
 
         "openapi should render as valid json spec" {
-            val asJson = api.asJson()
+            val asJson = validatedJson(api)
             println(asJson.toString(2))
-            val parsed = OpenApi3Parser().parse(api.asFile())
-            parsed.validationItems.size shouldBe 0
         }
     }
 }
