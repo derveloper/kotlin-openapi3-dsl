@@ -50,7 +50,12 @@ class OpenApi3BuilderTest : StringSpec() {
                                 content {
                                     mediaType<ExampleSchema>("application/json") {
                                         description = "bar"
-                                        example = ExampleSchema("bar")
+                                        example(ExampleSchema("bar")) {
+                                            description = "example schema value"
+                                        }
+                                        example(AnotherExampleSchema("foo")) {
+                                            description = "another example schema value"
+                                        }
                                     }
                                 }
                             }

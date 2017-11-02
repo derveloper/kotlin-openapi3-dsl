@@ -2,6 +2,7 @@ package cc.vileda.openapi.dsl
 
 import io.swagger.converter.ModelConverters
 import io.swagger.oas.models.*
+import io.swagger.oas.models.examples.Example
 import io.swagger.oas.models.info.Info
 import io.swagger.oas.models.media.Content
 import io.swagger.oas.models.media.MediaType
@@ -175,6 +176,17 @@ inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Uni
     val modelSchema = ModelConverters.getInstance().read(T::class.java)
     mediaType.schema = modelSchema[T::class.java.simpleName]
     addMediaType(name, mediaType)
+}
+
+inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
+    if (examples == null) {
+        examples = mutableMapOf()
+    }
+
+    val example = Example()
+    example.value = value
+    example.init()
+    examples.put(T::class.java.simpleName, example)
 }
 
 fun Server.variables(init: ServerVariables.() -> Unit) {

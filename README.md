@@ -100,15 +100,9 @@ private val api3 = openapiDsl {
                             content {
                                 mediaType<HelloRequest>("application/json") {
                                     description = "Hello request"
-                                    val ex = HelloRequest("World")
-                                    val exx = Example().apply {
-                                        value = ex
+                                    example(HelloRequest("World")) {
                                         description = "example request"
                                     }
-                                    examples = mapOf(
-                                            "HelloRequest" to exx
-                                    )
-                                    example = ex
                                 }
                             }
                         }
