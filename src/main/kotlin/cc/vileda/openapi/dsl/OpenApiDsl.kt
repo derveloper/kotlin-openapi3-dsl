@@ -5,9 +5,7 @@ import io.swagger.converter.ModelConverters
 import io.swagger.oas.models.*
 import io.swagger.oas.models.examples.Example
 import io.swagger.oas.models.info.Info
-import io.swagger.oas.models.media.Content
-import io.swagger.oas.models.media.MediaType
-import io.swagger.oas.models.media.Schema
+import io.swagger.oas.models.media.*
 import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.parameters.RequestBody
 import io.swagger.oas.models.responses.ApiResponse
@@ -197,27 +195,39 @@ fun Parameter.content(init: Content.() -> Unit) {
 }
 
 inline fun <reified T> Parameter.schema(init: Schema<*>.() -> Unit) {
-    schema = ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
+    schema = findSchema<T>()
     schema.init()
 }
 
 inline fun <reified T> Parameter.schema() {
-    schema = ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
+    schema = findSchema<T>()
+}
+
+inline fun <reified T> mediaType(): MediaType {
+    val mediaType = MediaType()
+    val modelSchema = findSchema<T>()
+    mediaType.schema = modelSchema
+    return mediaType
 }
 
 inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Unit) {
-    val mediaType = MediaType()
+    val mediaType = mediaType<T>()
     mediaType.init()
-    val modelSchema = ModelConverters.getInstance().read(T::class.java)
-    mediaType.schema = modelSchema[T::class.java.simpleName]
     addMediaType(name, mediaType)
 }
 
 inline fun <reified T> Content.mediaType(name: String) {
-    val mediaType = MediaType()
-    val modelSchema = ModelConverters.getInstance().read(T::class.java)
-    mediaType.schema = modelSchema[T::class.java.simpleName]
+    val mediaType = mediaType<T>()
     addMediaType(name, mediaType)
+}
+
+inline fun <reified T> findSchema(): Schema<*>? {
+    return when (T::class.java) {
+        String::class.java -> StringSchema()
+        Boolean::class.java -> BooleanSchema()
+        Int::class.java -> IntegerSchema()
+        else -> ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
+    }
 }
 
 inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
