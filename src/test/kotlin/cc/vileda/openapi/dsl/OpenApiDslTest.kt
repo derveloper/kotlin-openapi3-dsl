@@ -36,6 +36,9 @@ class OpenApi3BuilderTest : StringSpec() {
                 put("x-stable", true)
             }
             components {
+                schema<ExampleSchema>()
+                schema<ExampleRequestSchema>()
+                schema<AnotherExampleSchema>()
                 securityScheme {
                     name = "foo"
                     type = SecurityScheme.Type.OPENIDCONNECT
@@ -74,14 +77,14 @@ class OpenApi3BuilderTest : StringSpec() {
                             required = false
                             deprecated = true
                             content {
-                                mediaType<ExampleSchema>("application/json")
+                                mediaTypeRef<ExampleSchema>("application/json")
                             }
                         }
                         requestBody {
                             description = "example request"
                             required = true
                             content {
-                                mediaType<ExampleRequestSchema>("application/json") {
+                                mediaTypeRef<ExampleRequestSchema>("application/json") {
                                     description = "request schema"
                                     example(ExampleRequestSchema("bar")) {
                                         description = "example schema value"
@@ -93,13 +96,10 @@ class OpenApi3BuilderTest : StringSpec() {
                             response("foo") {
                                 description = "bar"
                                 content {
-                                    mediaType<ExampleSchema>("application/json") {
+                                    mediaTypeRef<AnotherExampleSchema>("application/json") {
                                         description = "bar"
-                                        example(ExampleSchema("bar")) {
+                                        example(AnotherExampleSchema("bar")) {
                                             description = "example schema value"
-                                        }
-                                        example(AnotherExampleSchema("foo")) {
-                                            description = "another example schema value"
                                         }
                                     }
                                 }

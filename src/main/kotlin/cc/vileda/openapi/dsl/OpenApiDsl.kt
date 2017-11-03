@@ -99,6 +99,23 @@ fun OpenAPI.components(init: Components.() -> Unit) {
     components.init()
 }
 
+inline fun <reified T> Components.schema(init: Schema<*>.() -> Unit) {
+    if (schemas == null) {
+        schemas = mutableMapOf()
+    }
+    val schema = findSchema<T>()
+    schema!!.init()
+    schemas.put(T::class.java.simpleName, schema)
+}
+
+inline fun <reified T> Components.schema() {
+    if (schemas == null) {
+        schemas = mutableMapOf()
+    }
+    val schema = findSchema<T>()
+    schemas.put(T::class.java.simpleName, schema)
+}
+
 fun Components.securityScheme(init: SecurityScheme.() -> Unit) {
     val security = SecurityScheme()
     security.init()
@@ -210,9 +227,27 @@ inline fun <reified T> mediaType(): MediaType {
     return mediaType
 }
 
+inline fun <reified T> mediaTypeRef(): MediaType {
+    val mediaType = MediaType()
+    mediaType.schema = Schema<T>()
+    mediaType.schema.`$ref` = T::class.java.simpleName
+    return mediaType
+}
+
 inline fun <reified T> Content.mediaType(name: String, init: MediaType.() -> Unit) {
     val mediaType = mediaType<T>()
     mediaType.init()
+    addMediaType(name, mediaType)
+}
+
+inline fun <reified T> Content.mediaTypeRef(name: String, init: MediaType.() -> Unit) {
+    val mediaType = mediaTypeRef<T>()
+    mediaType.init()
+    addMediaType(name, mediaType)
+}
+
+inline fun <reified T> Content.mediaTypeRef(name: String) {
+    val mediaType = mediaTypeRef<T>()
     addMediaType(name, mediaType)
 }
 
