@@ -32,8 +32,9 @@ for a complete example [look at the test](src/test/kotlin/cc/vileda/openapi/dsl/
 ### complete vertx.io example
 
 ```kotlin
+
 import cc.vileda.openapi.dsl.*
-import io.swagger.oas.models.examples.Example
+import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.security.SecurityScheme
 import io.vertx.core.Handler
 import io.vertx.core.json.JsonObject.mapFrom
@@ -60,6 +61,8 @@ private val api3 = openapiDsl {
     }
 
     components {
+        schema<HelloResponse>()
+        schema<HelloRequest>()
         securityScheme {
             name = "apiKey"
             type = SecurityScheme.Type.APIKEY
@@ -77,11 +80,18 @@ private val api3 = openapiDsl {
                 tags = listOf("without params")
                 operationId = "hello"
                 description = "hello get"
+                parameter {
+                    name = "id"
+                    `in` = "query"
+                    required = true
+                    style = Parameter.StyleEnum.SIMPLE
+                    schema<String>()
+                }
                 responses {
                     response("200") {
                         description = "a 200 response"
                         content {
-                            mediaType<HelloResponse>("application/json") {
+                            mediaTypeRef<HelloResponse>("application/json") {
                                 description = "Hello response"
                                 example = HelloResponse("World")
                             }
@@ -98,10 +108,10 @@ private val api3 = openapiDsl {
                         description = "created response"
                         requestBody {
                             content {
-                                mediaType<HelloRequest>("application/json") {
+                                mediaTypeRef<HelloRequest>("application/json") {
                                     description = "Hello request"
                                     example(HelloRequest("World")) {
-                                        description = "example request"
+                                        description = "hello request"
                                     }
                                 }
                             }
