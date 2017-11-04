@@ -383,10 +383,12 @@ inline fun <reified T> Content.mediaType(name: String) {
 }
 
 inline fun <reified T> findSchema(): Schema<*>? {
-    return when (T::class.java) {
-        String::class.java -> StringSchema()
-        Boolean::class.java -> BooleanSchema()
-        Int::class.java -> IntegerSchema()
+    return when (T::class) {
+        String::class -> StringSchema()
+        Boolean::class -> BooleanSchema()
+        java.lang.Boolean::class -> BooleanSchema()
+        Int::class -> IntegerSchema()
+        Integer::class -> IntegerSchema()
         else -> ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
     }
 }

@@ -3,6 +3,10 @@ package cc.vileda.openapi.dsl
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
+import io.swagger.oas.models.media.BooleanSchema
+import io.swagger.oas.models.media.IntegerSchema
+import io.swagger.oas.models.media.Schema
+import io.swagger.oas.models.media.StringSchema
 import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.security.SecurityScheme
 
@@ -123,6 +127,13 @@ class OpenApi3BuilderTest : StringSpec() {
         "openapi should render as valid json spec" {
             val asJson = validatedJson(api)
             println(asJson.toString(2))
+        }
+
+        "findSchema should return valid schema" {
+            findSchema<String>() shouldBe StringSchema()
+            findSchema<Int>() shouldBe IntegerSchema()
+            findSchema<Boolean>() shouldBe BooleanSchema()
+            findSchema<ExampleRequestSchema>()?.javaClass shouldBe Schema<ExampleRequestSchema>().javaClass
         }
     }
 }
