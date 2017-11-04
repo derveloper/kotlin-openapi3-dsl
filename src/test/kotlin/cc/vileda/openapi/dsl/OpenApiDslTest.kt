@@ -3,6 +3,7 @@ package cc.vileda.openapi.dsl
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
+import io.swagger.oas.models.PathItem
 import io.swagger.oas.models.media.BooleanSchema
 import io.swagger.oas.models.media.IntegerSchema
 import io.swagger.oas.models.media.Schema
@@ -53,8 +54,9 @@ class OpenApi3BuilderTest : StringSpec() {
                             authorizationUrl = "http://localhost:8080/auth"
                             refreshUrl = "http://localhost:8080/token"
                             tokenUrl = "http://localhost:8080/token"
+                            extension("x-internal", true)
                             scopes {
-                                extension("x-internal", true)
+                                extension("x-internal", false)
                                 scope("foo", "foo:read")
                             }
                         }
@@ -128,11 +130,21 @@ class OpenApi3BuilderTest : StringSpec() {
             }
         }
 
-        "builder should accept openapi fields" {
+        "builder should set openapi fields" {
             api shouldNotBe null
             api.openapi shouldBe "3.0.0"
             api.info.title shouldBe "jjjj"
             api.info.version shouldBe "1.0"
+            val securityScheme = api.components.securitySchemes["foo"]
+            securityScheme shouldNotBe null
+            securityScheme!!.flows!!.implicit shouldNotBe null
+            securityScheme.flows.implicit!!.extensions!!["x-internal"] shouldBe true
+            securityScheme.flows.implicit.scopes!!.extensions!!["x-internal"] shouldBe false
+            val postOp = api.paths["foo"]!!.readOperationsMap()!![PathItem.HttpMethod.POST]
+            postOp shouldNotBe null
+            postOp!!.extensions!!["x-version"] shouldBe "3.0"
+            postOp.responses["foo"]!!.description shouldBe "bar"
+            postOp.responses["foo"]!!.content!!["application/json"]!!.schema.javaClass shouldBe Schema<AnotherExampleSchema>().javaClass
         }
 
         "openapi should render as valid json spec" {
