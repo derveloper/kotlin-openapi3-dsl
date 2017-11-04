@@ -48,6 +48,17 @@ class OpenApi3BuilderTest : StringSpec() {
                     name = "foo"
                     type = SecurityScheme.Type.OPENIDCONNECT
                     openIdConnectUrl = "http://localhost/auth"
+                    flows {
+                        implicit {
+                            authorizationUrl = "http://localhost:8080/auth"
+                            refreshUrl = "http://localhost:8080/token"
+                            tokenUrl = "http://localhost:8080/token"
+                            scopes {
+                                extension("x-internal", true)
+                                scope("foo", "foo:read")
+                            }
+                        }
+                    }
                 }
             }
             security {

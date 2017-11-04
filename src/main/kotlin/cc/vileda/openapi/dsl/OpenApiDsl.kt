@@ -10,8 +10,7 @@ import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.parameters.RequestBody
 import io.swagger.oas.models.responses.ApiResponse
 import io.swagger.oas.models.responses.ApiResponses
-import io.swagger.oas.models.security.SecurityRequirement
-import io.swagger.oas.models.security.SecurityScheme
+import io.swagger.oas.models.security.*
 import io.swagger.oas.models.servers.Server
 import io.swagger.oas.models.servers.ServerVariable
 import io.swagger.oas.models.servers.ServerVariables
@@ -87,64 +86,24 @@ fun OpenAPI.paths(init: Paths.() -> Unit) {
     paths.init()
 }
 
-private fun OpenAPI.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun OpenAPI.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
-}
-
-private fun PathItem.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+    addExtension(name, value)
 }
 
 fun PathItem.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
-}
-
-private fun Operation.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+    addExtension(name, value)
 }
 
 fun Operation.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
-}
-
-private fun Components.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+    addExtension(name, value)
 }
 
 fun Components.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
-}
-
-private fun ApiResponse.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+    addExtension(name, value)
 }
 
 fun ApiResponse.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 fun OpenAPI.components(init: Components.() -> Unit) {
@@ -179,16 +138,57 @@ fun Components.securityScheme(init: SecurityScheme.() -> Unit) {
     securitySchemes.put(security.name, security)
 }
 
-private fun Tag.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+fun SecurityScheme.flows(init: OAuthFlows.() -> Unit) {
+    flows = OAuthFlows()
+    flows.init()
+}
+
+fun OAuthFlows.password(init: OAuthFlow.() -> Unit) {
+    password = OAuthFlow()
+    password.init()
+}
+
+fun OAuthFlows.implicit(init: OAuthFlow.() -> Unit) {
+    implicit = OAuthFlow()
+    implicit.init()
+}
+
+fun OAuthFlows.clientCredentials(init: OAuthFlow.() -> Unit) {
+    clientCredentials = OAuthFlow()
+    clientCredentials.init()
+}
+
+fun OAuthFlows.authorizationCode(init: OAuthFlow.() -> Unit) {
+    authorizationCode = OAuthFlow()
+    authorizationCode.init()
+}
+
+fun OAuthFlow.scopes(init: Scopes.() -> Unit) {
+    if (scopes == null)
+        scopes = Scopes()
+    scopes.init()
+}
+
+fun Scopes.scope(name: String, item: String) {
+    addString(name, item)
+}
+
+fun OAuthFlow.scope(name: String, item: String) {
+    if (scopes == null)
+        scopes = Scopes()
+    scopes.addString(name, item)
+}
+
+fun Scopes.extension(name: String, value: Any) {
+    addExtension(name, value)
+}
+
+fun OAuthFlow.extension(name: String, value: Any) {
+    addExtension(name, value)
 }
 
 fun Tag.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 fun Paths.path(name: String, init: PathItem.() -> Unit) {
@@ -197,16 +197,8 @@ fun Paths.path(name: String, init: PathItem.() -> Unit) {
     addPathItem(name, pathItem)
 }
 
-private fun Paths.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun Paths.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 fun PathItem.get(init: Operation.() -> Unit) {
@@ -271,7 +263,7 @@ fun Operation.parameter(init: Parameter.() -> Unit) {
 fun ApiResponses.response(name: String, init: ApiResponse.() -> Unit) {
     val response = ApiResponse()
     response.init()
-    put(name, response)
+    addApiResponse(name, response)
 }
 
 fun ApiResponse.content(init: Content.() -> Unit) {
@@ -284,40 +276,16 @@ fun RequestBody.content(init: Content.() -> Unit) {
     content.init()
 }
 
-private fun RequestBody.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun RequestBody.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
-}
-
-private fun Parameter.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+    addExtension(name, value)
 }
 
 fun Parameter.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
-}
-
-private fun ExternalDocumentation.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
+    addExtension(name, value)
 }
 
 fun ExternalDocumentation.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 fun Parameter.content(init: Content.() -> Unit) {
@@ -334,16 +302,8 @@ inline fun <reified T> Parameter.schema() {
     schema = findSchema<T>()
 }
 
-private fun <T> Schema<T>.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun <T> Schema<T>.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 inline fun <reified T> mediaType(): MediaType {
@@ -393,16 +353,8 @@ inline fun <reified T> findSchema(): Schema<*>? {
     }
 }
 
-private fun MediaType.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun MediaType.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
@@ -421,16 +373,8 @@ fun Server.variables(init: ServerVariables.() -> Unit) {
     variables.init()
 }
 
-private fun Server.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun Server.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
 
 fun ServerVariables.variable(name: String, init: ServerVariable.() -> Unit) {
@@ -439,14 +383,6 @@ fun ServerVariables.variable(name: String, init: ServerVariable.() -> Unit) {
     addServerVariable(name, serverVariable)
 }
 
-private fun ServerVariables.extensions(init: MutableMap<String, Any>.() -> Unit) {
-    if (extensions == null)
-        extensions = mutableMapOf()
-    extensions.init()
-}
-
 fun ServerVariables.extension(name: String, value: Any) {
-    extensions {
-        put(name, value)
-    }
+    addExtension(name, value)
 }
