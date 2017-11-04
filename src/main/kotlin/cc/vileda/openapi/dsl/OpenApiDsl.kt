@@ -87,10 +87,64 @@ fun OpenAPI.paths(init: Paths.() -> Unit) {
     paths.init()
 }
 
-fun OpenAPI.extensions(init: MutableMap<String, Any>.() -> Unit) {
+private fun OpenAPI.extensions(init: MutableMap<String, Any>.() -> Unit) {
     if (extensions == null)
         extensions = mutableMapOf()
     extensions.init()
+}
+
+fun OpenAPI.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
+private fun PathItem.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun PathItem.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
+private fun Operation.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun Operation.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
+private fun Components.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun Components.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
+private fun ApiResponse.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun ApiResponse.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
 }
 
 fun OpenAPI.components(init: Components.() -> Unit) {
@@ -125,10 +179,34 @@ fun Components.securityScheme(init: SecurityScheme.() -> Unit) {
     securitySchemes.put(security.name, security)
 }
 
+private fun Tag.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun Tag.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
 fun Paths.path(name: String, init: PathItem.() -> Unit) {
     val pathItem = PathItem()
     pathItem.init()
     addPathItem(name, pathItem)
+}
+
+private fun Paths.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun Paths.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
 }
 
 fun PathItem.get(init: Operation.() -> Unit) {
@@ -206,6 +284,42 @@ fun RequestBody.content(init: Content.() -> Unit) {
     content.init()
 }
 
+private fun RequestBody.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun RequestBody.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
+private fun Parameter.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun Parameter.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
+private fun ExternalDocumentation.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun ExternalDocumentation.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
 fun Parameter.content(init: Content.() -> Unit) {
     content = Content()
     content.init()
@@ -218,6 +332,18 @@ inline fun <reified T> Parameter.schema(init: Schema<*>.() -> Unit) {
 
 inline fun <reified T> Parameter.schema() {
     schema = findSchema<T>()
+}
+
+private fun <T> Schema<T>.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun <T> Schema<T>.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
 }
 
 inline fun <reified T> mediaType(): MediaType {
@@ -265,6 +391,18 @@ inline fun <reified T> findSchema(): Schema<*>? {
     }
 }
 
+private fun MediaType.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun MediaType.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
 inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
     if (examples == null) {
         examples = mutableMapOf()
@@ -281,8 +419,32 @@ fun Server.variables(init: ServerVariables.() -> Unit) {
     variables.init()
 }
 
+private fun Server.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun Server.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
+}
+
 fun ServerVariables.variable(name: String, init: ServerVariable.() -> Unit) {
     val serverVariable = ServerVariable()
     serverVariable.init()
     addServerVariable(name, serverVariable)
+}
+
+private fun ServerVariables.extensions(init: MutableMap<String, Any>.() -> Unit) {
+    if (extensions == null)
+        extensions = mutableMapOf()
+    extensions.init()
+}
+
+fun ServerVariables.extension(name: String, value: Any) {
+    extensions {
+        put(name, value)
+    }
 }

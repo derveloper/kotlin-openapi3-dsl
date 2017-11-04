@@ -18,6 +18,7 @@ class OpenApi3BuilderTest : StringSpec() {
             tag {
                 name = "example_tag"
                 description = "an example tag"
+                extension("x-beta", true)
             }
             externalDocs {
                 description = "developer hub"
@@ -29,12 +30,12 @@ class OpenApi3BuilderTest : StringSpec() {
                 variables {
                     variable("foo") {
                         addEnumItem("bar")
+                        extension("x-foo", "bar")
                     }
                 }
             }
-            extensions {
-                put("x-stable", true)
-            }
+            extension("x-stable", true)
+            extension("x-internal", true)
             components {
                 schema<ExampleSchema>()
                 schema<ExampleRequestSchema>()
@@ -54,9 +55,11 @@ class OpenApi3BuilderTest : StringSpec() {
             }
             paths {
                 path("foo") {
+                    extension("x-experimental", true)
                     post {
                         description = "test"
                         tags = listOf("tag1")
+                        extension("x-version", "3.0")
                         parameter {
                             name = "id"
                             `in` = "path"

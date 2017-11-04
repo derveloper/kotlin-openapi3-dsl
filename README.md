@@ -12,7 +12,7 @@ kotlin-openapi3-dsl is available on maven central
 ### gradle
 
 ```groovy
-compile "cc.vileda:kotlin-openapi3-dsl:0.15.8"
+compile "cc.vileda:kotlin-openapi3-dsl:0.16.0"
 ```
 
 ### maven
@@ -20,7 +20,7 @@ compile "cc.vileda:kotlin-openapi3-dsl:0.15.8"
 <dependency>
     <groupId>cc.vileda</groupId>
     <artifactId>kotlin-openapi3-dsl</artifactId>
-    <version>0.15.8</version>
+    <version>0.16.0</version>
 </dependency>
 ```
 
@@ -103,6 +103,7 @@ private val api3 = openapiDsl {
                 tags = listOf("without params")
                 operationId = "postHello"
                 description = "hello post"
+                extension("x-stable", true)
                 responses {
                     response("201") {
                         description = "created response"
