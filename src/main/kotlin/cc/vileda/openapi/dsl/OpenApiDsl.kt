@@ -342,6 +342,36 @@ inline fun <reified T> Content.mediaType(name: String) {
     addMediaType(name, mediaType)
 }
 
+inline fun <reified T> Content.mediaTypeArrayOfRef(name: String, init: MediaType.() -> Unit) {
+    val mediaTypeArray = mediaType<List<*>>()
+    val mediaTypeObj = mediaTypeRef<T>()
+    mediaTypeArray.init()
+    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    addMediaType(name, mediaTypeArray)
+}
+
+inline fun <reified T> Content.mediaTypeArrayOf(name: String, init: MediaType.() -> Unit) {
+    val mediaTypeArray = mediaType<List<*>>()
+    val mediaTypeObj = mediaType<T>()
+    mediaTypeArray.init()
+    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    addMediaType(name, mediaTypeArray)
+}
+
+inline fun <reified T> Content.mediaTypeArrayOfRef(name: String) {
+    val mediaTypeArray = mediaType<List<*>>()
+    val mediaTypeObj = mediaTypeRef<T>()
+    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    addMediaType(name, mediaTypeArray)
+}
+
+inline fun <reified T> Content.mediaTypeArrayOf(name: String) {
+    val mediaTypeArray = mediaType<List<*>>()
+    val mediaTypeObj = mediaType<T>()
+    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    addMediaType(name, mediaTypeArray)
+}
+
 inline fun <reified T> findSchema(): Schema<*>? {
     return when (T::class) {
         String::class -> StringSchema()
@@ -349,6 +379,7 @@ inline fun <reified T> findSchema(): Schema<*>? {
         java.lang.Boolean::class -> BooleanSchema()
         Int::class -> IntegerSchema()
         Integer::class -> IntegerSchema()
+        List::class -> ArraySchema()
         else -> ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
     }
 }

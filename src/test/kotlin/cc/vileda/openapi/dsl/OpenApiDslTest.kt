@@ -1,13 +1,11 @@
 package cc.vileda.openapi.dsl
 
+import io.kotlintest.matchers.instanceOf
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
 import io.swagger.oas.models.PathItem
-import io.swagger.oas.models.media.BooleanSchema
-import io.swagger.oas.models.media.IntegerSchema
-import io.swagger.oas.models.media.Schema
-import io.swagger.oas.models.media.StringSchema
+import io.swagger.oas.models.media.*
 import io.swagger.oas.models.parameters.Parameter
 import io.swagger.oas.models.security.SecurityScheme
 
@@ -15,6 +13,7 @@ import io.swagger.oas.models.security.SecurityScheme
 data class ExampleSchema(val foo: String)
 data class AnotherExampleSchema(val bar: String)
 data class ExampleRequestSchema(val foo: String)
+data class ListExampleSchema(val baz : List<ExampleSchema>)
 
 class OpenApi3BuilderTest : StringSpec() {
     init {
@@ -45,6 +44,7 @@ class OpenApi3BuilderTest : StringSpec() {
                 schema<ExampleSchema>()
                 schema<ExampleRequestSchema>()
                 schema<AnotherExampleSchema>()
+                schema<ListExampleSchema>()
                 securityScheme {
                     name = "foo"
                     type = SecurityScheme.Type.OPENIDCONNECT
@@ -126,6 +126,18 @@ class OpenApi3BuilderTest : StringSpec() {
                             }
                         }
                     }
+                    get{
+                        responses{
+                            response("200"){
+                                content {
+                                    mediaTypeArrayOfRef<ExampleSchema>("application/json"){
+                                        example(ExampleSchema("foo")){
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -157,6 +169,13 @@ class OpenApi3BuilderTest : StringSpec() {
             findSchema<Int>() shouldBe IntegerSchema()
             findSchema<Boolean>() shouldBe BooleanSchema()
             findSchema<ExampleRequestSchema>()?.javaClass shouldBe Schema<ExampleRequestSchema>().javaClass
+        }
+
+        "findSchema should return a valid schema for a list" {
+            val schema = api.paths["foo"]!!.readOperationsMap()!![PathItem.HttpMethod.GET]!!.responses["200"]!!.content!!["application/json"]!!.schema
+            schema.type shouldBe "array"
+            schema shouldBe instanceOf(ArraySchema()::class)
+            (schema as ArraySchema).items.`$ref` shouldBe "#/components/schemas/ExampleSchema"
         }
     }
 }
