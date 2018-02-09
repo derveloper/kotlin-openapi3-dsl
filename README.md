@@ -127,6 +127,24 @@ private val api3 = openapiDsl {
                 }
             }
         }
+        path("/greetings") {
+            get {
+                tags = listOf("without params")
+                operationId = "greetings"
+                description = "greetings get"
+                responses {
+                    response("200"){
+                        description = "a 200 response"
+                        content {
+                            mediaTypeArrayOfRef<HelloResponse>("application/json") {
+                                description = "An array of HelloResponses"
+                                example = HelloResponse("Greetings")
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
