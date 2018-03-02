@@ -150,7 +150,7 @@ dependencies {
     compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jackson_version"
     compile "com.fasterxml.jackson.datatype:jackson-datatype-json-org:$jackson_version"
     compile group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '0.0.2.201710151503'
-    compile 'io.swagger:swagger-core:2.0.0-rc2'
+    compile 'io.swagger.core.v3:swagger-core:2.0.0-rc4'
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     /*if(JavaVersion.current() == JavaVersion.VERSION_1_9){
         compile 'javax.xml.bind:jaxb-api:2.3.0'

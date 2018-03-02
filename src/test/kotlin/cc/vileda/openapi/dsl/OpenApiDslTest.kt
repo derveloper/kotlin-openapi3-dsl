@@ -4,10 +4,10 @@ import io.kotlintest.matchers.instanceOf
 import io.kotlintest.matchers.shouldBe
 import io.kotlintest.matchers.shouldNotBe
 import io.kotlintest.specs.StringSpec
-import io.swagger.oas.models.PathItem
-import io.swagger.oas.models.media.*
-import io.swagger.oas.models.parameters.Parameter
-import io.swagger.oas.models.security.SecurityScheme
+import io.swagger.v3.oas.models.PathItem
+import io.swagger.v3.oas.models.media.*
+import io.swagger.v3.oas.models.parameters.Parameter
+import io.swagger.v3.oas.models.security.SecurityScheme
 
 
 data class ExampleSchema(val foo: String)
