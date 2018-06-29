@@ -46,7 +46,6 @@ class OpenApi3BuilderTest : StringSpec() {
                 schema<AnotherExampleSchema>()
                 schema<ListExampleSchema>()
                 securityScheme {
-                    name = "foo"
                     type = SecurityScheme.Type.OPENIDCONNECT
                     openIdConnectUrl = "http://localhost/auth"
                     flows {
@@ -64,7 +63,7 @@ class OpenApi3BuilderTest : StringSpec() {
                 }
             }
             security {
-                put("foo", listOf("bar"))
+                put(SecurityScheme.Type.OPENIDCONNECT.toString(), listOf("bar"))
             }
             info {
                 title = "jjjj"
@@ -147,7 +146,8 @@ class OpenApi3BuilderTest : StringSpec() {
             api.openapi shouldBe "3.0.0"
             api.info.title shouldBe "jjjj"
             api.info.version shouldBe "1.0"
-            val securityScheme = api.components.securitySchemes["foo"]
+            val securityScheme =
+                    api.components.securitySchemes[SecurityScheme.Type.OPENIDCONNECT.toString()]
             securityScheme shouldNotBe null
             securityScheme!!.flows!!.implicit shouldNotBe null
             securityScheme.flows.implicit!!.extensions!!["x-internal"] shouldBe true
