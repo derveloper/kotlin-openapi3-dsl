@@ -8,12 +8,18 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.*
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.security.SecurityScheme
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.*
 
 
 data class ExampleSchema(val foo: String)
 data class AnotherExampleSchema(val bar: String)
 data class ExampleRequestSchema(val foo: String)
 data class ListExampleSchema(val baz : List<ExampleSchema>)
+
+enum class ExampleEnum {ONE, TWO}
 
 class OpenApi3BuilderTest : StringSpec() {
     init {
@@ -45,6 +51,7 @@ class OpenApi3BuilderTest : StringSpec() {
                 schema<ExampleRequestSchema>()
                 schema<AnotherExampleSchema>()
                 schema<ListExampleSchema>()
+                schema<ExampleEnum>()
                 securityScheme {
                     type = SecurityScheme.Type.OPENIDCONNECT
                     openIdConnectUrl = "http://localhost/auth"
@@ -168,7 +175,19 @@ class OpenApi3BuilderTest : StringSpec() {
             findSchema<String>() shouldBe StringSchema()
             findSchema<Int>() shouldBe IntegerSchema()
             findSchema<Boolean>() shouldBe BooleanSchema()
+            findSchema<Long>() shouldBe IntegerSchema().format("int64")
+            findSchema<BigDecimal>() shouldBe IntegerSchema().format("")
+            findSchema<Date>() shouldBe DateSchema()
+            findSchema<LocalDate>() shouldBe DateSchema()
+            findSchema<LocalDateTime>() shouldBe DateTimeSchema()
             findSchema<ExampleRequestSchema>()?.javaClass shouldBe Schema<ExampleRequestSchema>().javaClass
+        }
+
+        "findSchema should return a valid schema for an enum" {
+            val schema = findSchema<ExampleEnum>()
+            schema shouldNotBe null
+            schema?.type shouldBe "string"
+            schema?.enum shouldBe listOf("ONE", "TWO")
         }
 
         "findSchema should return a valid schema for a list" {
