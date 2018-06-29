@@ -18,7 +18,11 @@ import io.swagger.v3.oas.models.servers.ServerVariables
 import io.swagger.v3.oas.models.tags.Tag
 import org.json.JSONObject
 import java.io.File
+import java.math.BigDecimal
 import java.nio.file.Files
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Date
 
 fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
     val openapi3 = OpenAPI()
@@ -375,15 +379,30 @@ inline fun <reified T> Content.mediaTypeArrayOf(name: String) {
 }
 
 inline fun <reified T> findSchema(): Schema<*>? {
-    return when (T::class) {
+    return getEnumSchema<T>() ?: when (T::class) {
         String::class -> StringSchema()
         Boolean::class -> BooleanSchema()
         java.lang.Boolean::class -> BooleanSchema()
         Int::class -> IntegerSchema()
         Integer::class -> IntegerSchema()
         List::class -> ArraySchema()
+        Long::class -> IntegerSchema().format("int64")
+        BigDecimal::class -> IntegerSchema().format("")
+        Date::class -> DateSchema()
+        LocalDate::class -> DateSchema()
+        LocalDateTime::class -> DateTimeSchema()
         else -> ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
     }
+}
+
+inline fun <reified T> getEnumSchema(): Schema<*>? {
+    val values = T::class.java.enumConstants ?: return null
+
+    val schema = StringSchema()
+    for (enumVal in values) {
+        schema.addEnumItem(enumVal.toString())
+    }
+    return schema
 }
 
 fun MediaType.extension(name: String, value: Any) {
