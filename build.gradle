@@ -2,7 +2,7 @@ group 'cc.vileda'
 version '0.19.0'
 
 buildscript {
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.51'
     ext.jackson_version = '2.9.6'
 
     repositories {
