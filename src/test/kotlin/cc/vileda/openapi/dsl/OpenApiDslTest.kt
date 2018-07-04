@@ -1,8 +1,8 @@
 package cc.vileda.openapi.dsl
 
 import io.kotlintest.matchers.instanceOf
-import io.kotlintest.matchers.shouldBe
-import io.kotlintest.matchers.shouldNotBe
+import io.kotlintest.shouldBe
+import io.kotlintest.shouldNotBe
 import io.kotlintest.specs.StringSpec
 import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.*
