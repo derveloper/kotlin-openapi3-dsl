@@ -62,7 +62,6 @@ class OpenApi3BuilderTest : StringSpec() {
                             tokenUrl = "http://localhost:8080/token"
                             extension("x-internal", true)
                             scopes {
-                                extension("x-internal", false)
                                 scope("foo", "foo:read")
                             }
                         }
@@ -158,7 +157,7 @@ class OpenApi3BuilderTest : StringSpec() {
             securityScheme shouldNotBe null
             securityScheme!!.flows!!.implicit shouldNotBe null
             securityScheme.flows.implicit!!.extensions!!["x-internal"] shouldBe true
-            securityScheme.flows.implicit.scopes!!.extensions!!["x-internal"] shouldBe false
+
             val postOp = api.paths["foo"]!!.readOperationsMap()!![PathItem.HttpMethod.POST]
             postOp shouldNotBe null
             postOp!!.extensions!!["x-version"] shouldBe "3.0"

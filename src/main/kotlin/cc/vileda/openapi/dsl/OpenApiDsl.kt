@@ -22,7 +22,7 @@ import java.math.BigDecimal
 import java.nio.file.Files
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Date
+import java.util.*
 
 fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
     val openapi3 = OpenAPI()
@@ -183,10 +183,6 @@ fun OAuthFlow.scope(name: String, item: String) {
     if (scopes == null)
         scopes = Scopes()
     scopes.addString(name, item)
-}
-
-fun Scopes.extension(name: String, value: Any) {
-    addExtension(name, value)
 }
 
 fun OAuthFlow.extension(name: String, value: Any) {
@@ -433,8 +429,4 @@ fun ServerVariables.variable(name: String, init: ServerVariable.() -> Unit) {
     val serverVariable = ServerVariable()
     serverVariable.init()
     addServerVariable(name, serverVariable)
-}
-
-fun ServerVariables.extension(name: String, value: Any) {
-    addExtension(name, value)
 }
