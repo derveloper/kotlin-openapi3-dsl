@@ -156,11 +156,8 @@ dependencies {
     compile group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '4.0.1-201809050415'
     compile 'io.swagger.core.v3:swagger-core:2.0.4'
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    /*if(JavaVersion.current() == JavaVersion.VERSION_1_9){
-        compile 'javax.xml.bind:jaxb-api:2.3.0'
-        compile 'org.eclipse.persistence:eclipselink:2.7.0'
-    }*/
     testCompile 'io.kotlintest:kotlintest-runner-junit5:3.1.10'
+    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 }
 
 compileKotlin {
