@@ -413,7 +413,7 @@ inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
     val example = Example()
     example.value = value
     example.init()
-    examples.put(T::class.java.simpleName, example)
+    examples[T::class.java.simpleName] = example
 }
 
 fun Server.variables(init: ServerVariables.() -> Unit) {
