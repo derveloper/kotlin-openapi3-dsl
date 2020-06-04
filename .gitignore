@@ -184,3 +184,4 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 /classes/
+/.kotlintest/spec_failures
