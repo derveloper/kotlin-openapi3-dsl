@@ -17,45 +17,10 @@ buildscript {
 
 apply plugin: 'kotlin'
 apply plugin: 'com.jfrog.bintray'
-apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
 repositories {
     mavenCentral()
-}
-
-install {
-    repositories.mavenInstaller {
-        pom.project {
-            name 'kotlin-openapi3-dsl'
-            description 'Build your OpenApi3 spec in kotlin!'
-            url 'https://github.com/derveloper/kotlin-openapi3-dsl'
-            inceptionYear '2017'
-
-            packaging 'jar'
-            groupId 'cc.vileda'
-            artifactId 'kotlin-openapi3-dsl'
-            version "$version"
-
-            licenses {
-                license {
-                    name 'The Apache Software License, Version 2.0'
-                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    distribution 'repo'
-                }
-            }
-            scm {
-                connection 'https://github.com/derveloper/kotlin-openapi3-dsl.git'
-                url 'https://github.com/derveloper/kotlin-openapi3-dsl'
-
-            }
-            developers {
-                developer {
-                    name 'Tristan Leo'
-                }
-            }
-        }
-    }
 }
 
 def pomConfig = {
@@ -118,7 +83,6 @@ publishing {
 bintray {
     user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : (System.getenv('BINTRAY_USER') != null ? System.getenv('BINTRAY_USER') : "")
     key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : (System.getenv('BINTRAY_API_KEY') != null ? System.getenv('BINTRAY_API_KEY') : "")
-    //configurations = ['archives']
     publications = ['mavenJava']
     publish = true
     pkg {
@@ -148,16 +112,16 @@ test {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "$jackson_version"
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "$jackson_version"
-    compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jackson_version"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-json-org:$jackson_version"
-    compile group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '4.0.4'
-    compile 'io.swagger.core.v3:swagger-core:2.0.8'
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    testCompile 'io.kotlintest:kotlintest-runner-junit5:3.4.0'
-    testCompile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "$jackson_version"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "$jackson_version"
+    implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jackson_version"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-json-org:$jackson_version"
+    implementation group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '4.0.4'
+    implementation 'io.swagger.core.v3:swagger-core:2.0.8'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.0'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.28'
 }
 
 compileKotlin {
