@@ -118,7 +118,7 @@ dependencies {
     implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jackson_version"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-json-org:$jackson_version"
     implementation group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '4.0.4'
-    implementation 'io.swagger.core.v3:swagger-core:2.1.2'
+    api 'io.swagger.core.v3:swagger-core:2.1.2'
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
     testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
