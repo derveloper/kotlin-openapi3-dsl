@@ -17,9 +17,9 @@ import java.util.*
 data class ExampleSchema(val foo: String)
 data class AnotherExampleSchema(val bar: String)
 data class ExampleRequestSchema(val foo: String)
-data class ListExampleSchema(val baz : List<ExampleSchema>)
+data class ListExampleSchema(val baz: List<ExampleSchema>)
 
-enum class ExampleEnum {ONE, TWO}
+enum class ExampleEnum { ONE, TWO }
 
 class OpenApi3BuilderTest : StringSpec() {
     init {
@@ -131,12 +131,12 @@ class OpenApi3BuilderTest : StringSpec() {
                             }
                         }
                     }
-                    get{
-                        responses{
-                            response("200"){
+                    get {
+                        responses {
+                            response("200") {
                                 content {
-                                    mediaTypeArrayOfRef<ExampleSchema>("application/json"){
-                                        example(ExampleSchema("foo")){
+                                    mediaTypeArrayOfRef<ExampleSchema>("application/json") {
+                                        example(ExampleSchema("foo")) {
                                         }
                                     }
                                 }
