@@ -1,9 +1,6 @@
-group 'cc.vileda'
-version '1.0.0'
-
 buildscript {
-    ext.kotlin_version = '1.4.0'
-    ext.jackson_version = '2.11.2'
+    ext.kotlin_version = '1.5.0'
+    ext.jackson_version = '2.12.3'
 
     repositories {
         mavenCentral()
@@ -15,9 +12,16 @@ buildscript {
     }
 }
 
+plugins {
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+}
+
 apply plugin: 'kotlin'
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+group 'cc.vileda'
+version '1.1.0'
 
 repositories {
     mavenCentral()
@@ -80,31 +84,23 @@ publishing {
     }
 }
 
-bintray {
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : (System.getenv('BINTRAY_USER') != null ? System.getenv('BINTRAY_USER') : "")
-    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : (System.getenv('BINTRAY_API_KEY') != null ? System.getenv('BINTRAY_API_KEY') : "")
-    publications = ['mavenJava']
-    publish = true
-    pkg {
-        repo = 'maven'
-        name = 'kotlin-openapi3-dsl'
-        userOrg = 'vileda'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/derveloper/kotlin-openapi3-dsl.git'
-        version {
-            name = project.version
-            gpg {
-                sign = true
-                passphrase = project.hasProperty('gpgPass') ? project.property('gpgPass') : (System.getenv('GPG_PASS') != null ? System.getenv('GPG_PASS') : "")
-            }
-            mavenCentralSync {
-                sync = true //Optional (true by default). Determines whether to sync the version to Maven Central.
-                user = project.hasProperty('sonaAccessUser') ? project.property('sonaAccessUser') : (System.getenv('SONA_ACCESS_USER') != null ? System.getenv('SONA_ACCESS_USER') : "")
-                password = project.hasProperty('sonaAccessToken') ? project.property('sonaAccessToken') : (System.getenv('SONA_ACCESS_TOKEN') != null ? System.getenv('SONA_ACCESS_TOKEN') : "")
-                close = '1' //Optional property. By default the staging repository is closed and artifacts are released to Maven Central. You can optionally turn this behaviour off (by puting 0 as value) and release the version manually.
-            }
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl = uri("https://oss.sonatype.org/service/local/")
+            snapshotRepositoryUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            username = project.hasProperty('sonaAccessUser') ? project.property('sonaAccessUser') : ""
+            password = project.hasProperty('sonaAccessToken') ? project.property('sonaAccessToken') : ""
         }
     }
+}
+
+ext["signing.keyId"] = project.hasProperty("signing.keyId") ? project.property("signing.keyId") : ""
+ext["signing.password"] = project.hasProperty("signing.password") ? project.property("signing.password") : ""
+ext["signing.secretKeyRingFile"] = project.hasProperty("signing.secretKeyRingFile") ? project.property("signing.secretKeyRingFile") : ""
+
+signing {
+    sign publishing.publications
 }
 
 test {
@@ -118,7 +114,7 @@ dependencies {
     implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jackson_version"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-json-org:$jackson_version"
     implementation group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '4.0.4'
-    api 'io.swagger.core.v3:swagger-core:2.1.4'
+    api 'io.swagger.core.v3:swagger-core:2.1.9'
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
     testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
