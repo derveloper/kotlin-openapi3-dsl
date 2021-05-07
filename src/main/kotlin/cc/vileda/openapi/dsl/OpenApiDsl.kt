@@ -64,24 +64,21 @@ fun OpenAPI.externalDocs(init: ExternalDocumentation.() -> Unit) {
 fun OpenAPI.server(init: Server.() -> Unit) {
     val server = Server()
     server.init()
-    if (servers == null)
-        servers = mutableListOf()
+    servers = servers ?: mutableListOf()
     servers.add(server)
 }
 
 fun OpenAPI.security(init: SecurityRequirement.() -> Unit) {
     val securityReq = SecurityRequirement()
     securityReq.init()
-    if (security == null)
-        security = mutableListOf()
+    security = security ?: mutableListOf()
     security.add(securityReq)
 }
 
 fun OpenAPI.tag(init: Tag.() -> Unit) {
     val tag = Tag()
     tag.init()
-    if (tags == null)
-        tags = mutableListOf()
+    tags = tags ?: mutableListOf()
     tags.add(tag)
 }
 
@@ -111,24 +108,19 @@ fun ApiResponse.extension(name: String, value: Any) {
 }
 
 fun OpenAPI.components(init: Components.() -> Unit) {
-    if (components == null)
-        components = Components()
+    components = components ?: Components()
     components.init()
 }
 
 inline fun <reified T> Components.schema(init: Schema<*>.() -> Unit) {
-    if (schemas == null) {
-        schemas = mutableMapOf()
-    }
-    val schema = findSchema<T>()
-    schema!!.init()
+    schemas = schemas ?: mutableMapOf()
+    val schema = findSchema<T>() ?: throw Exception("could not find schema")
+    schema.init()
     schemas.put(T::class.java.simpleName, schema)
 }
 
 inline fun <reified T> Components.schema() {
-    if (schemas == null) {
-        schemas = mutableMapOf()
-    }
+    schemas = schemas ?: mutableMapOf()
     val schema = findSchema<T>()
     schemas.put(T::class.java.simpleName, schema)
 }
@@ -136,9 +128,8 @@ inline fun <reified T> Components.schema() {
 fun Components.securityScheme(init: SecurityScheme.() -> Unit) {
     val security = SecurityScheme()
     security.init()
-    if (securitySchemes == null) {
-        securitySchemes = mutableMapOf()
-    }
+    securitySchemes = securitySchemes ?: mutableMapOf()
+
     // Security schemes will not validate with a name value. Use https://editor.swagger.io to validate.
     // Use the type as the name. see https://swagger.io/docs/specification/authentication/
     securitySchemes.put(security.type.toString(), security)
@@ -170,8 +161,7 @@ fun OAuthFlows.authorizationCode(init: OAuthFlow.() -> Unit) {
 }
 
 fun OAuthFlow.scopes(init: Scopes.() -> Unit) {
-    if (scopes == null)
-        scopes = Scopes()
+    scopes = scopes ?: Scopes()
     scopes.init()
 }
 
@@ -180,8 +170,7 @@ fun Scopes.scope(name: String, item: String) {
 }
 
 fun OAuthFlow.scope(name: String, item: String) {
-    if (scopes == null)
-        scopes = Scopes()
+    scopes = scopes ?: Scopes()
     scopes.addString(name, item)
 }
 
@@ -254,9 +243,7 @@ fun Operation.requestBody(init: RequestBody.() -> Unit) {
 }
 
 fun Operation.parameter(init: Parameter.() -> Unit) {
-    if (parameters == null) {
-        parameters = mutableListOf()
-    }
+    parameters = parameters ?: mutableListOf()
     val parameter = Parameter()
     parameter.init()
     parameters.add(parameter)
@@ -348,7 +335,8 @@ inline fun <reified T> Content.mediaTypeArrayOfRef(name: String, init: MediaType
     val mediaTypeArray = mediaType<List<*>>()
     val mediaTypeObj = mediaTypeRef<T>()
     mediaTypeArray.init()
-    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    val arraySchema = mediaTypeArray.schema as ArraySchema
+    arraySchema.items(mediaTypeObj.schema)
     addMediaType(name, mediaTypeArray)
 }
 
@@ -356,21 +344,24 @@ inline fun <reified T> Content.mediaTypeArrayOf(name: String, init: MediaType.()
     val mediaTypeArray = mediaType<List<*>>()
     val mediaTypeObj = mediaType<T>()
     mediaTypeArray.init()
-    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    val arraySchema = mediaTypeArray.schema as ArraySchema
+    arraySchema.items(mediaTypeObj.schema)
     addMediaType(name, mediaTypeArray)
 }
 
 inline fun <reified T> Content.mediaTypeArrayOfRef(name: String) {
     val mediaTypeArray = mediaType<List<*>>()
     val mediaTypeObj = mediaTypeRef<T>()
-    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    val arraySchema = mediaTypeArray.schema as ArraySchema
+    arraySchema.items(mediaTypeObj.schema)
     addMediaType(name, mediaTypeArray)
 }
 
 inline fun <reified T> Content.mediaTypeArrayOf(name: String) {
     val mediaTypeArray = mediaType<List<*>>()
     val mediaTypeObj = mediaType<T>()
-    (mediaTypeArray.schema as ArraySchema).items(mediaTypeObj.schema)
+    val arraySchema = mediaTypeArray.schema as ArraySchema
+    arraySchema.items(mediaTypeObj.schema)
     addMediaType(name, mediaTypeArray)
 }
 
@@ -406,9 +397,7 @@ fun MediaType.extension(name: String, value: Any) {
 }
 
 inline fun <reified T> MediaType.example(value: T, init: Example.() -> Unit) {
-    if (examples == null) {
-        examples = mutableMapOf()
-    }
+    examples = examples ?: mutableMapOf()
 
     val example = Example()
     example.value = value
