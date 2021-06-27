@@ -1,14 +1,12 @@
 buildscript {
-    ext.kotlin_version = '1.5.0'
+    ext.kotlin_version = '1.5.20'
     ext.jackson_version = '2.12.3'
 
     repositories {
         mavenCentral()
-        jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5'
     }
 }
 
@@ -82,6 +80,17 @@ publishing {
             }
         }
     }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/octocat/hello-world"
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }
 
 nexusPublishing {
@@ -113,11 +122,11 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "$jackson_version"
     implementation "com.fasterxml.jackson.module:jackson-module-jsonSchema:$jackson_version"
     implementation "com.fasterxml.jackson.datatype:jackson-datatype-json-org:$jackson_version"
-    implementation group: 'com.reprezen.kaizen', name: 'openapi-parser', version: '4.0.4'
     api 'io.swagger.core.v3:swagger-core:2.1.9'
+    api 'io.swagger.parser.v3:swagger-parser:2.0.26'
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
-    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.30'
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.31'
 }
 
 compileKotlin {

@@ -1,6 +1,5 @@
 package cc.vileda.openapi.dsl
 
-import com.reprezen.kaizen.oasparser.OpenApi3Parser
 import io.swagger.v3.core.converter.ModelConverters
 import io.swagger.v3.core.util.Json
 import io.swagger.v3.oas.models.*
@@ -16,6 +15,7 @@ import io.swagger.v3.oas.models.servers.Server
 import io.swagger.v3.oas.models.servers.ServerVariable
 import io.swagger.v3.oas.models.servers.ServerVariables
 import io.swagger.v3.oas.models.tags.Tag
+import io.swagger.v3.parser.OpenAPIV3Parser
 import org.json.JSONObject
 import java.io.File
 import java.math.BigDecimal
@@ -32,7 +32,7 @@ fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
 
 internal fun validatedJson(api: OpenAPI): JSONObject {
     val json = Json.mapper().writeValueAsString(api)
-    OpenApi3Parser().parse(toFile(json), true)
+    OpenAPIV3Parser().read(toFile(json).absolutePath)
     return JSONObject(json)
 }
 
