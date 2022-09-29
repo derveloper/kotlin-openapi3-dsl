@@ -110,7 +110,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.13.4'
     api 'io.swagger.core.v3:swagger-core:2.2.3'
     api 'io.swagger.parser.v3:swagger-parser:2.1.3'
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.10'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.7.20'
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
     testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.3'
 }
