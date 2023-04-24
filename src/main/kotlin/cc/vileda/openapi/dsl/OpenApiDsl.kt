@@ -125,14 +125,14 @@ inline fun <reified T> Components.schema() {
     schemas.put(T::class.java.simpleName, schema)
 }
 
-fun Components.securityScheme(init: SecurityScheme.() -> Unit) {
+fun Components.securityScheme(name: String, init: SecurityScheme.() -> Unit) {
     val security = SecurityScheme()
     security.init()
     securitySchemes = securitySchemes ?: mutableMapOf()
 
     // Security schemes will not validate with a name value. Use https://editor.swagger.io to validate.
     // Use the type as the name. see https://swagger.io/docs/specification/authentication/
-    securitySchemes.put(security.type.toString(), security)
+    addSecuritySchemes(name, security)
 }
 
 fun SecurityScheme.flows(init: OAuthFlows.() -> Unit) {

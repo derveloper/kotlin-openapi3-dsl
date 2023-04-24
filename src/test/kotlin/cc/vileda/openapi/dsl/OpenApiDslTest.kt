@@ -19,7 +19,11 @@ data class AnotherExampleSchema(val bar: String)
 data class ExampleRequestSchema(val foo: String)
 data class ListExampleSchema(val baz: List<ExampleSchema>)
 
-enum class ExampleEnum { ONE, TWO }
+@Suppress("unused")
+enum class ExampleEnum {
+    ONE,
+    TWO
+}
 
 class OpenApi3BuilderTest : StringSpec() {
     init {
@@ -52,9 +56,9 @@ class OpenApi3BuilderTest : StringSpec() {
                 schema<AnotherExampleSchema>()
                 schema<ListExampleSchema>()
                 schema<ExampleEnum>()
-                securityScheme {
+                securityScheme("bearer") {
                     type = SecurityScheme.Type.OPENIDCONNECT
-                    openIdConnectUrl = "http://localhost/auth"
+                    openIdConnectUrl = "http://localhost:8080/auth"
                     flows {
                         implicit {
                             authorizationUrl = "http://localhost:8080/auth"
@@ -153,10 +157,11 @@ class OpenApi3BuilderTest : StringSpec() {
             api.info.title shouldBe "jjjj"
             api.info.version shouldBe "1.0"
             val securityScheme =
-                    api.components.securitySchemes[SecurityScheme.Type.OPENIDCONNECT.toString()]
+                    api.components.securitySchemes["bearer"]
             securityScheme shouldNotBe null
             securityScheme!!.flows!!.implicit shouldNotBe null
             securityScheme.flows.implicit!!.extensions!!["x-internal"] shouldBe true
+            securityScheme.type shouldBe SecurityScheme.Type.OPENIDCONNECT
 
             val postOp = api.paths["foo"]!!.readOperationsMap()!![PathItem.HttpMethod.POST]
             postOp shouldNotBe null
