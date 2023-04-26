@@ -1,5 +1,6 @@
 name: Publish package to the Maven Central Repository
 on:
+  workflow_dispatch:
   release:
     types: [ created ]
 jobs:
@@ -19,4 +20,4 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_PASSPHRASE }}
-        run: ./gradlew publishToSonatype --no-daemon
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-daemon

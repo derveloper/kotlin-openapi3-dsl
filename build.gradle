@@ -84,17 +84,14 @@ nexusPublishing {
         sonatype {
             nexusUrl = uri("https://oss.sonatype.org/service/local/")
             snapshotRepositoryUrl = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-            username = project.hasProperty('sonaAccessUser') ? project.property('sonaAccessUser') : ""
-            password = project.hasProperty('sonaAccessToken') ? project.property('sonaAccessToken') : ""
         }
     }
 }
 
-ext["signing.keyId"] = project.hasProperty("signing.keyId") ? project.property("signing.keyId") : ""
-ext["signing.password"] = project.hasProperty("signing.password") ? project.property("signing.password") : ""
-ext["signing.secretKeyRingFile"] = project.hasProperty("signing.secretKeyRingFile") ? project.property("signing.secretKeyRingFile") : ""
-
 signing {
+    def signingKey = findProperty("signingKey")
+    def signingPassword = findProperty("signingPassword")
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications
 }
 
