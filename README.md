@@ -12,7 +12,7 @@ kotlin-openapi3-dsl is available on maven central
 ### gradle
 
 ```groovy
-compile "cc.vileda:kotlin-openapi3-dsl:1.3.0"
+compile "cc.vileda:kotlin-openapi3-dsl:1.3.1"
 ```
 
 ### maven
@@ -20,7 +20,7 @@ compile "cc.vileda:kotlin-openapi3-dsl:1.3.0"
 <dependency>
     <groupId>cc.vileda</groupId>
     <artifactId>kotlin-openapi3-dsl</artifactId>
-    <version>1.3.0</version>
+    <version>1.3.1</version>
 </dependency>
 ```
 
