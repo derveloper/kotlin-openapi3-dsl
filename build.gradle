@@ -3,7 +3,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.23"
     }
 }
 
@@ -100,14 +100,14 @@ test {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.22'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.16.1"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.16.1"
     implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.16.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.16.1'
     api 'io.swagger.core.v3:swagger-core:2.2.20'
     api 'io.swagger.parser.v3:swagger-parser:2.1.21'
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.9.22'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.9.23'
     testImplementation 'io.kotlintest:kotlintest-runner-junit5:3.4.2'
     testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.12'
 }
