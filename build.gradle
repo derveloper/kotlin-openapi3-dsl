@@ -102,7 +102,7 @@ test {
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.23'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.16.2"
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.16.1"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.16.2"
     implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.16.1'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.16.1'
     api 'io.swagger.core.v3:swagger-core:2.2.20'
