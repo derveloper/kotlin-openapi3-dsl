@@ -16,7 +16,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 group 'cc.vileda'
-version '1.4.0'
+version '1.5.0'
 
 repositories {
     mavenCentral()
