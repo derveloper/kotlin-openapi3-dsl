@@ -101,10 +101,10 @@ test {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.10'
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.21.0"
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.21.0"
-    implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.21.0'
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.21.0'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.21.1"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.21.1"
+    implementation 'com.fasterxml.jackson.module:jackson-module-jsonSchema:2.21.1'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-json-org:2.21.1'
     api 'io.swagger.core.v3:swagger-core:2.2.43'
     api 'io.swagger.parser.v3:swagger-parser:2.1.38'
     implementation 'org.jetbrains.kotlin:kotlin-reflect:2.3.10'
