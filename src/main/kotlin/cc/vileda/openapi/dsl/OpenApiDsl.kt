@@ -30,18 +30,31 @@ fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
     return openapi3
 }
 
-internal fun validatedJson(api: OpenAPI): JSONObject {
-    val json = Json.mapper().writeValueAsString(api)
+private fun validatedJsonString(api: OpenAPI, pretty: Boolean): String {
+    val mapper = Json.mapper()
+    val json = if (pretty) {
+        mapper.writerWithDefaultPrettyPrinter().writeValueAsString(api)
+    } else {
+        mapper.writeValueAsString(api)
+    }
     OpenAPIV3Parser().read(toFile(json).absolutePath)
-    return JSONObject(json)
+    return json
+}
+
+internal fun validatedJson(api: OpenAPI): JSONObject {
+    return JSONObject(validatedJsonString(api, pretty = false))
 }
 
 fun OpenAPI.asJson(): JSONObject {
     return validatedJson(this)
 }
 
+fun OpenAPI.asJsonString(pretty: Boolean = false): String {
+    return validatedJsonString(this, pretty)
+}
+
 fun OpenAPI.asFile(): File {
-    return toFile(asJson().toString(2))
+    return toFile(asJsonString(pretty = true))
 }
 
 private fun toFile(json: String): File {

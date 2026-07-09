@@ -28,6 +28,12 @@ compile "cc.vileda:kotlin-openapi3-dsl:1.5.0"
 
 for a complete example [look at the test](src/test/kotlin/cc/vileda/openapi/dsl/OpenApiDslTest.kt)
 
+## output
+
+`asJsonString()` and `asFile()` preserve the insertion order used by the DSL.
+Use `asJsonString(pretty = true)` for formatted JSON without writing a file.
+`asJson()` returns a `JSONObject`, whose key order is intentionally unspecified.
+
 ## license
 ```
 Copyright 2017 Tristan Leo
