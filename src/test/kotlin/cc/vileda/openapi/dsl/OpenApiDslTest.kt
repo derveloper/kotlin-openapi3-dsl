@@ -8,6 +8,8 @@ import io.swagger.v3.oas.models.PathItem
 import io.swagger.v3.oas.models.media.*
 import io.swagger.v3.oas.models.parameters.Parameter
 import io.swagger.v3.oas.models.security.SecurityScheme
+import io.swagger.v3.oas.models.responses.ApiResponse
+import org.json.JSONObject
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -199,6 +201,55 @@ class OpenApi3BuilderTest : StringSpec() {
             schema.type shouldBe "array"
             schema shouldBe instanceOf(ArraySchema()::class)
             (schema as ArraySchema).items.`$ref` shouldBe "#/components/schemas/ExampleSchema"
+        }
+
+        val standardResponses = linkedMapOf(
+            "400" to ApiResponse().apply { description = "Bad Request" },
+            "401" to ApiResponse().apply { description = "Unauthorized" },
+            "500" to ApiResponse().apply { description = "Internal Server Error" }
+        )
+        val orderingApi = openapiDsl {
+            info { title = "ordering-test"; version = "1.0" }
+            paths {
+                path("/items") {
+                    get {
+                        responses {
+                            response("204") { description = "No Content" }
+                            putAll(standardResponses)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Regression for issue #146: JSONObject scrambles key order; Jackson must preserve it
+        "asJsonString should preserve 204-first insertion order when putAll adds shared responses" {
+            val json = orderingApi.asJsonString()
+            val idx204 = json.indexOf("\"204\"")
+            val idx400 = json.indexOf("\"400\"")
+            val idx401 = json.indexOf("\"401\"")
+            val idx500 = json.indexOf("\"500\"")
+            (idx204 in 0 until idx400) shouldBe true
+            (idx400 < idx401) shouldBe true
+            (idx401 < idx500) shouldBe true
+        }
+
+        "asFile should preserve 204-first insertion order when putAll adds shared responses" {
+            val content = orderingApi.asFile().readText()
+            val idx204 = content.indexOf("\"204\"")
+            val idx400 = content.indexOf("\"400\"")
+            val idx401 = content.indexOf("\"401\"")
+            val idx500 = content.indexOf("\"500\"")
+            (idx204 in 0 until idx400) shouldBe true
+            (idx400 < idx401) shouldBe true
+            (idx401 < idx500) shouldBe true
+        }
+
+        "asFile pretty output is valid parseable JSON" {
+            val content = orderingApi.asFile().readText()
+            val parsed = JSONObject(content)
+            parsed.has("openapi") shouldBe true
+            parsed.has("paths") shouldBe true
         }
     }
 }
