@@ -20,7 +20,11 @@ import java.io.File
 import java.nio.file.Files
 
 fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
-    return buildOpenApi(init)
+    return openapiDsl(OpenApiDslConfig(), init)
+}
+
+fun openapiDsl(config: OpenApiDslConfig, init: OpenAPI.() -> Unit): OpenAPI {
+    return buildOpenApi(config, init)
 }
 
 private fun validatedJsonString(api: OpenAPI, pretty: Boolean): String {

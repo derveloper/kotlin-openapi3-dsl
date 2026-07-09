@@ -76,6 +76,22 @@ content {
 `components { schema<T>() }` also registers transitive models. Explicit schema
 customisations take precedence over automatically discovered schemas.
 
+### Kotlin required properties
+
+Required-property inference is disabled by default. Enable it for one DSL build:
+
+```kotlin
+openapiDsl(
+    OpenApiDslConfig(inferRequiredFromKotlinNullability = true)
+) {
+    // ...
+}
+```
+
+Non-null Kotlin primary-constructor properties without default values are then
+added to the schema's `required` list. Nullable and defaulted properties remain
+optional. Explicit Swagger `requiredMode` annotations take precedence.
+
 ## output
 
 `asJsonString()` and `asFile()` preserve the insertion order used by the DSL.
