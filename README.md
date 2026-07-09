@@ -58,6 +58,24 @@ paths {
 }
 ```
 
+### recursive schemas
+
+`mediaTypeRef<T>()` and `mediaTypeArrayOfRef<T>()` automatically add `T` and
+all transitively referenced models to `components.schemas`. An explicit
+components block is not required:
+
+```kotlin
+data class ErrorDetail(val message: String)
+data class ErrorResponse(val detail: ErrorDetail)
+
+content {
+    mediaTypeRef<ErrorResponse>("application/json")
+}
+```
+
+`components { schema<T>() }` also registers transitive models. Explicit schema
+customisations take precedence over automatically discovered schemas.
+
 ## output
 
 `asJsonString()` and `asFile()` preserve the insertion order used by the DSL.

@@ -1,6 +1,5 @@
 package cc.vileda.openapi.dsl
 
-import io.swagger.v3.core.converter.ModelConverters
 import io.swagger.v3.core.util.Json
 import io.swagger.v3.oas.models.*
 import io.swagger.v3.oas.models.examples.Example
@@ -18,16 +17,10 @@ import io.swagger.v3.oas.models.tags.Tag
 import io.swagger.v3.parser.OpenAPIV3Parser
 import org.json.JSONObject
 import java.io.File
-import java.math.BigDecimal
 import java.nio.file.Files
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.*
 
 fun openapiDsl(init: OpenAPI.() -> Unit): OpenAPI {
-    val openapi3 = OpenAPI()
-    openapi3.init()
-    return openapi3
+    return buildOpenApi(init)
 }
 
 private fun validatedJsonString(api: OpenAPI, pretty: Boolean): String {
@@ -126,15 +119,16 @@ fun OpenAPI.components(init: Components.() -> Unit) {
 }
 
 inline fun <reified T> Components.schema(init: Schema<*>.() -> Unit) {
-    schemas = schemas ?: mutableMapOf()
-    val schema = findSchema<T>() ?: throw Exception("could not find schema")
-    schema.init()
-    schemas[T::class.java.simpleName] = schema
+    val resolved = resolveTypeSchemas(T::class.java)
+        ?: throw IllegalArgumentException("could not resolve schema for ${T::class.qualifiedName}")
+    resolved.root.init()
+    addResolvedSchemas(resolved)
 }
 
 inline fun <reified T> Components.schema() {
-    schemas = schemas ?: mutableMapOf()
-    schemas[T::class.java.simpleName] = findSchema<T>()
+    val resolved = resolveTypeSchemas(T::class.java)
+        ?: throw IllegalArgumentException("could not resolve schema for ${T::class.qualifiedName}")
+    addResolvedSchemas(resolved)
 }
 
 fun Components.securityScheme(name: String, init: SecurityScheme.() -> Unit) {
@@ -309,9 +303,10 @@ inline fun <reified T> mediaType(): MediaType {
 }
 
 inline fun <reified T> mediaTypeRef(): MediaType {
+    val referenceName = registerSchemaReference(T::class.java)
     val mediaType = MediaType()
     mediaType.schema = Schema<T>()
-    mediaType.schema.`$ref` = T::class.java.simpleName
+    mediaType.schema.`$ref` = referenceName
     return mediaType
 }
 
@@ -372,30 +367,11 @@ inline fun <reified T> Content.mediaTypeArrayOf(name: String) {
 }
 
 inline fun <reified T> findSchema(): Schema<*>? {
-    return getEnumSchema<T>() ?: when (T::class) {
-        String::class -> StringSchema()
-        Boolean::class -> BooleanSchema()
-        java.lang.Boolean::class -> BooleanSchema()
-        Int::class -> IntegerSchema()
-        Integer::class -> IntegerSchema()
-        List::class -> ArraySchema()
-        Long::class -> IntegerSchema().format("int64")
-        BigDecimal::class -> IntegerSchema().format("")
-        Date::class -> DateSchema()
-        LocalDate::class -> DateSchema()
-        LocalDateTime::class -> DateTimeSchema()
-        else -> ModelConverters.getInstance().read(T::class.java)[T::class.java.simpleName]
-    }
+    return resolveTypeSchemas(T::class.java)?.root
 }
 
 inline fun <reified T> getEnumSchema(): Schema<*>? {
-    val values = T::class.java.enumConstants ?: return null
-
-    val schema = StringSchema()
-    for (enumVal in values) {
-        schema.addEnumItem(enumVal.toString())
-    }
-    return schema
+    return enumSchema(T::class.java)
 }
 
 fun MediaType.extension(name: String, value: Any) {
