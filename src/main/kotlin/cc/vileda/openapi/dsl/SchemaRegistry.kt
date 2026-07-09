@@ -24,7 +24,7 @@ internal data class ResolvedTypeSchemas(
     val schemas: Map<String, Schema<*>>
 )
 
-private class SchemaBuildScope {
+private class SchemaBuildScope(val config: OpenApiDslConfig) {
     private val resolvedTypes = LinkedHashMap<Class<*>, ResolvedTypeSchemas>()
 
     fun register(type: Class<*>): String {
@@ -50,9 +50,15 @@ private class SchemaBuildScope {
 
 private val schemaScopes = ThreadLocal<ArrayDeque<SchemaBuildScope>>()
 
-internal fun buildOpenApi(init: OpenAPI.() -> Unit): OpenAPI {
+private val defaultConfig = OpenApiDslConfig()
+
+private fun currentConfig(): OpenApiDslConfig {
+    return schemaScopes.get()?.peekLast()?.config ?: defaultConfig
+}
+
+internal fun buildOpenApi(config: OpenApiDslConfig, init: OpenAPI.() -> Unit): OpenAPI {
     val stack = schemaScopes.get() ?: ArrayDeque<SchemaBuildScope>().also(schemaScopes::set)
-    val scope = SchemaBuildScope()
+    val scope = SchemaBuildScope(config)
     stack.addLast(scope)
 
     return try {
@@ -74,24 +80,28 @@ internal fun registerSchemaReference(type: Class<*>): String {
 @PublishedApi
 internal fun resolveTypeSchemas(type: Class<*>): ResolvedTypeSchemas? {
     val knownSchema = knownSchema(type)
-    if (knownSchema != null) {
-        return ResolvedTypeSchemas(
+    val result = if (knownSchema != null) {
+        ResolvedTypeSchemas(
             rootName = type.simpleName,
             root = knownSchema,
             schemas = linkedMapOf(type.simpleName to knownSchema)
         )
+    } else {
+        val resolved = ModelConverters.getInstance().readAllAsResolvedSchema(type) ?: return null
+        val root = resolved.schema ?: return null
+        val schemas = LinkedHashMap<String, Schema<*>>()
+        resolved.referencedSchemas?.forEach { (name, schema) -> schemas[name] = schema }
+        val rootName = schemas.entries.firstOrNull { (_, schema) ->
+            schema === root || schema == root
+        }?.key ?: type.simpleName
+        schemas.putIfAbsent(rootName, root)
+        ResolvedTypeSchemas(rootName, root, schemas)
     }
 
-    val resolved = ModelConverters.getInstance().readAllAsResolvedSchema(type) ?: return null
-    val root = resolved.schema ?: return null
-    val schemas = LinkedHashMap<String, Schema<*>>()
-    resolved.referencedSchemas?.forEach { (name, schema) -> schemas[name] = schema }
-    val rootName = schemas.entries.firstOrNull { (_, schema) ->
-        schema === root || schema == root
-    }?.key ?: type.simpleName
-    schemas.putIfAbsent(rootName, root)
-
-    return ResolvedTypeSchemas(rootName, root, schemas)
+    if (currentConfig().inferRequiredFromKotlinNullability) {
+        inferRequiredProperties(type, result.rootName, result.schemas)
+    }
+    return result
 }
 
 @PublishedApi
