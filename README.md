@@ -28,6 +28,36 @@ compile "cc.vileda:kotlin-openapi3-dsl:1.5.0"
 
 for a complete example [look at the test](src/test/kotlin/cc/vileda/openapi/dsl/OpenApiDslTest.kt)
 
+### reusable components
+
+The `components` block supports every OpenAPI 3.0 component type: schemas,
+responses, parameters, examples, request bodies, headers, security schemes,
+links, and callbacks. Reference helpers accept component names and create the
+canonical `#/components/...` reference:
+
+```kotlin
+components {
+    parameter("PageSize") {
+        name = "pageSize"
+        `in` = "query"
+    }
+    response("NotFound") {
+        description = "resource not found"
+    }
+}
+
+paths {
+    path("/items") {
+        get {
+            parameterRef("PageSize")
+            responses {
+                responseRef("404", "NotFound")
+            }
+        }
+    }
+}
+```
+
 ## output
 
 `asJsonString()` and `asFile()` preserve the insertion order used by the DSL.
