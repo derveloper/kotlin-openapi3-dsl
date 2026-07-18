@@ -16,6 +16,7 @@ jobs:
           cache: gradle
       - name: Publish with Gradle
         env:
+          # Replace these legacy secret values with a Central Portal user token.
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.OSSRH_PASSWORD }}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
