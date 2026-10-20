@@ -1,7 +1,7 @@
 # kotlin-openapi3-dsl
 
-![Java CI with Gradle](https://github.com/derveloper/kotlin-openapi3-dsl/workflows/Java%20CI%20with%20Gradle/badge.svg)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/cc.vileda/kotlin-openapi3-dsl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/cc.vileda/kotlin-openapi3-dsl)
+[![Java CI with Gradle](https://github.com/derveloper/kotlin-openapi3-dsl/actions/workflows/gradle.yml/badge.svg)](https://github.com/derveloper/kotlin-openapi3-dsl/actions/workflows/gradle.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/cc.vileda/kotlin-openapi3-dsl)](https://central.sonatype.com/artifact/cc.vileda/kotlin-openapi3-dsl)
 
 Build your OpenApi3 spec in kotlin!
 
@@ -12,7 +12,7 @@ kotlin-openapi3-dsl is available on maven central
 ### gradle
 
 ```groovy
-compile "cc.vileda:kotlin-openapi3-dsl:1.6.0"
+implementation "cc.vileda:kotlin-openapi3-dsl:1.6.0"
 ```
 
 ### maven
